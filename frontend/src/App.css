@@ -1,0 +1,298 @@
+.app-shell {
+  display: flex;
+  min-height: 100vh;
+  background: var(--surface);
+}
+
+.sidebar {
+  width: 280px;
+  flex: 0 0 280px;
+  border-right: 1px solid var(--border);
+  background: #ffffff;
+  padding: 24px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--ink);
+  margin-bottom: 36px;
+}
+
+.brand span {
+  display: block;
+  font-weight: 800;
+}
+
+.brand small {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.nav-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.nav-list a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--muted);
+  text-decoration: none;
+  padding: 11px 12px;
+  border-radius: 8px;
+  font-weight: 650;
+}
+
+.nav-list a.active,
+.nav-list a:hover {
+  color: var(--ink);
+  background: #edf7f4;
+}
+
+.content {
+  flex: 1;
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.topbar,
+.panel-heading,
+.teacher-band,
+.teacher-stats,
+.recommendation-list article {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.eyebrow {
+  margin: 0 0 6px;
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.topbar h1,
+.hero-panel h2,
+.panel h2,
+.teacher-band h2 {
+  margin: 0;
+  color: var(--ink);
+}
+
+.topbar h1 {
+  font-size: 28px;
+}
+
+.icon-button {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #ffffff;
+  color: var(--ink);
+}
+
+.hero-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 180px;
+  gap: 24px;
+  align-items: center;
+  padding: 28px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #143d35, #276e60);
+  color: #e8f5f1;
+}
+
+.hero-panel h2 {
+  max-width: 780px;
+  color: #ffffff;
+  font-size: 32px;
+  line-height: 1.18;
+}
+
+.hero-panel p:last-child {
+  max-width: 720px;
+  color: #cbe5de;
+}
+
+.score-ring {
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 14px solid #9ad7c7;
+  display: grid;
+  place-items: center;
+  align-content: center;
+}
+
+.score-ring strong {
+  color: #ffffff;
+  font-size: 34px;
+}
+
+.score-ring span {
+  color: #cbe5de;
+  font-size: 13px;
+}
+
+.metric-grid,
+.workspace-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.metric-grid article,
+.panel {
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.metric-grid article {
+  display: grid;
+  gap: 8px;
+}
+
+.metric-grid svg {
+  color: var(--accent);
+}
+
+.metric-grid span,
+.panel-heading span,
+.recommendation-list span,
+.teacher-stats span {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.metric-grid strong {
+  color: var(--ink);
+  font-size: 26px;
+}
+
+.workspace-grid {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+
+.path-list {
+  margin: 18px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 12px;
+}
+
+.path-list li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--ink);
+}
+
+.path-list span {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #edf7f4;
+  color: var(--accent);
+  font-weight: 800;
+  font-size: 13px;
+}
+
+.recommendation-list {
+  display: grid;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.recommendation-list article {
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.recommendation-list strong {
+  display: block;
+  color: var(--ink);
+}
+
+.recommendation-list small {
+  color: var(--accent);
+  font-weight: 800;
+}
+
+.teacher-band {
+  padding: 22px;
+  border-radius: 8px;
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+}
+
+.teacher-band h2 {
+  font-size: 20px;
+}
+
+.teacher-stats {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.teacher-stats span {
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #9a3412;
+  font-weight: 750;
+}
+
+@media (max-width: 900px) {
+  .app-shell {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: auto;
+    flex: initial;
+    border-right: 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .nav-list {
+    flex-direction: row;
+    overflow-x: auto;
+  }
+
+  .content {
+    padding: 18px;
+  }
+
+  .hero-panel,
+  .metric-grid,
+  .workspace-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .score-ring {
+    width: 160px;
+  }
+
+  .teacher-band {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
