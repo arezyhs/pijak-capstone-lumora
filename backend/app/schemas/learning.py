@@ -50,3 +50,14 @@ class TeacherOverview(BaseModel):
     average_score: float
     risk_topics: list[str]
     students_need_attention: list[str]
+
+
+class QuizSubmission(BaseModel):
+    subject: str
+    score: float = Field(ge=0, le=100)
+
+
+class QuizResult(BaseModel):
+    message: str
+    quiz_score: float
+    new_difficulty: str

@@ -12,30 +12,39 @@ from sklearn.metrics import classification_report, accuracy_score
 def main():
     # Set paths
     base_dir = os.path.dirname(os.path.dirname(__file__))
-    data_path = os.path.join(base_dir, 'data', 'xAPI-Edu-Data.csv')
+    data_path = os.path.join(base_dir, 'data', 'Students Performance Dataset.csv')
     model_dir = os.path.join(base_dir, 'models')
     os.makedirs(model_dir, exist_ok=True)
-    model_path = os.path.join(model_dir, 'student_performance_model.joblib')
+    model_path = os.path.join(model_dir, 'student_behavior_model.joblib')
 
     # Load data
     print(f"Loading data from {data_path}...")
     df = pd.read_csv(data_path)
     
-    # Drop irrelevant demographic features
-    columns_to_drop = [
-        'gender', 'NationalITy', 'PlaceofBirth', 'StageID', 'GradeID', 
-        'SectionID', 'Semester', 'Relation', 'ParentAnsweringSurvey', 
-        'ParentschoolSatisfaction', 'StudentAbsenceDays'
+    # Map 'Grade' to 'Class' (Remedial, Standard, Advanced)
+    def map_grade(grade):
+        if grade in ['F', 'D']: return 'Remedial'
+        elif grade in ['C', 'B']: return 'Standard'
+        elif grade == 'A': return 'Advanced'
+        return 'Standard'
+
+    df['Class'] = df['Grade'].apply(map_grade)
+    
+    # We will only use academic and behavioral metrics relevant to Lumora MVP
+    # Drop IDs, target leakage (Final, Midterm, Total), and demographics
+    columns_to_keep = [
+        'Department', 'Attendance (%)', 'Assignments_Avg', 'Quizzes_Avg', 
+        'Participation_Score', 'Study_Hours_per_Week', 'Class'
     ]
-    df = df.drop(columns=columns_to_drop, errors='ignore')
+    df = df[columns_to_keep].dropna()
     
     # Target and features
     X = df.drop('Class', axis=1)
     y = df['Class']
 
     # Identify numeric and categorical columns
-    numeric_features = ['raisedhands', 'VisITedResources', 'AnnouncementsView', 'Discussion']
-    categorical_features = [col for col in X.columns if col not in numeric_features]
+    numeric_features = ['Attendance (%)', 'Assignments_Avg', 'Quizzes_Avg', 'Participation_Score', 'Study_Hours_per_Week']
+    categorical_features = ['Department']
 
     # Preprocessing
     preprocessor = ColumnTransformer(
@@ -47,14 +56,14 @@ def main():
     # Model pipeline
     pipeline = Pipeline(steps=[
         ('preprocessor', preprocessor),
-        ('classifier', RandomForestClassifier(n_estimators=100, random_state=42))
+        ('classifier', RandomForestClassifier(n_estimators=100, max_depth=10, random_state=42))
     ])
 
     # Split data
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
 
     # Train
-    print("Training Random Forest Classifier...")
+    print("Training Random Forest Classifier on new massive dataset...")
     pipeline.fit(X_train, y_train)
 
     # Evaluate
