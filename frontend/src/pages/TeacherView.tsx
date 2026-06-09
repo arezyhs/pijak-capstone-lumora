@@ -31,7 +31,7 @@ export function TeacherView() {
 
   if (loading) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', flexDirection: 'column', gap: '1rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '80vh', flexDirection: 'column', gap: '1rem' }}>
         <Brain size={48} color="var(--accent-primary)" style={{ animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite' }} />
         <h2 style={{ color: 'var(--ink)' }}>Menarik Data Kelas...</h2>
       </div>
@@ -40,9 +40,9 @@ export function TeacherView() {
 
   if (error || !teacher) {
     return (
-      <div style={{ padding: '2rem', color: 'var(--danger)', textAlign: 'center' }}>
-        <h2>Oops!</h2>
-        <p>{error}</p>
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '80vh', flexDirection: 'column', padding: '2rem', color: 'var(--danger)', textAlign: 'center' }}>
+        <h2 style={{ marginBottom: '8px' }}>Oops!</h2>
+        <p style={{ maxWidth: '400px', lineHeight: '1.6' }}>{error}</p>
       </div>
     )
   }
@@ -64,7 +64,7 @@ export function TeacherView() {
         <div className="teacher-stats">
           <span>{teacher.total_students} Total Siswa</span>
           <span>{Math.round(teacher.average_completion_rate * 100)}% Laju Kelas</span>
-          <span>{teacher.average_score} Skor Rata-rata</span>
+          <span>{teacher.average_score.toFixed(1)} Skor Rata-rata</span>
         </div>
       </section>
 

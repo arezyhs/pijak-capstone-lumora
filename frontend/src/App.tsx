@@ -5,6 +5,8 @@ import { QuizView } from './pages/QuizView'
 import { MaterialView } from './pages/MaterialView'
 import { TeacherView } from './pages/TeacherView'
 import { LoginView } from './pages/LoginView'
+import { ProfileView } from './pages/ProfileView'
+import { OnboardingView } from './pages/OnboardingView'
 import './App.css'
 
 function ProtectedRoute({ children, allowedRoles }: { children: React.ReactNode, allowedRoles?: string[] }) {
@@ -19,6 +21,14 @@ function ProtectedRoute({ children, allowedRoles }: { children: React.ReactNode,
   if (allowedRoles && !allowedRoles.includes(role)) {
     // Pengguna mencoba mengakses rute yang tidak sesuai perannya
     return <Navigate to={role === 'teacher' ? '/teacher' : '/dashboard'} replace />;
+  }
+
+  // Cek apakah siswa sudah mengisi kuesioner onboarding
+  if (role === 'student' && location.pathname !== '/onboarding') {
+    const hasCompletedOnboarding = localStorage.getItem('has_completed_onboarding');
+    if (!hasCompletedOnboarding) {
+      return <Navigate to="/onboarding" replace />;
+    }
   }
 
   return <>{children}</>;
@@ -39,6 +49,11 @@ function App() {
       <Route path="/login" element={<LoginView />} />
       
       {/* Rute Siswa */}
+      <Route path="/onboarding" element={
+        <ProtectedRoute allowedRoles={['student']}>
+          <OnboardingView />
+        </ProtectedRoute>
+      } />
       <Route path="/dashboard" element={
         <ProtectedRoute allowedRoles={['student']}>
           <MainLayout><Dashboard /></MainLayout>
@@ -59,6 +74,13 @@ function App() {
       <Route path="/teacher" element={
         <ProtectedRoute allowedRoles={['teacher']}>
           <MainLayout><TeacherView /></MainLayout>
+        </ProtectedRoute>
+      } />
+
+      {/* Rute Shared */}
+      <Route path="/profile" element={
+        <ProtectedRoute allowedRoles={['student', 'teacher']}>
+          <MainLayout><ProfileView /></MainLayout>
         </ProtectedRoute>
       } />
 

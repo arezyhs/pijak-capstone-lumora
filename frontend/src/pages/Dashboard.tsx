@@ -62,7 +62,7 @@ export function Dashboard() {
 
   if (loading) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', flexDirection: 'column', gap: '1rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '80vh', flexDirection: 'column', gap: '1rem' }}>
         <Brain size={48} color="var(--accent-primary)" style={{ animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite' }} />
         <h2 style={{ color: 'var(--ink)' }}>Menyelaraskan AI Engine...</h2>
       </div>
@@ -71,15 +71,15 @@ export function Dashboard() {
 
   if (error || !dashboard) {
     return (
-      <div style={{ padding: '2rem', color: 'var(--danger)', textAlign: 'center' }}>
-        <h2>Oops!</h2>
-        <p>{error}</p>
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '80vh', flexDirection: 'column', padding: '2rem', color: 'var(--danger)', textAlign: 'center' }}>
+        <h2 style={{ marginBottom: '8px' }}>Oops!</h2>
+        <p style={{ maxWidth: '400px', lineHeight: '1.6' }}>{error}</p>
       </div>
     )
   }
 
-  const isRemedial = dashboard.recommendation.difficulty === 'remedial'
-  const diffLabel = dashboard.recommendation.difficulty.charAt(0).toUpperCase() + dashboard.recommendation.difficulty.slice(1)
+  const isNeedsAttention = ['Fundamental Level', 'Visual Learning Path', 'Microlearning Mode'].includes(dashboard.recommendation.difficulty)
+  const diffLabel = dashboard.recommendation.difficulty
 
   return (
     <div className="content">
@@ -100,12 +100,12 @@ export function Dashboard() {
       </header>
 
       {/* Hero — AI Status */}
-      <section className="hero-panel" style={isRemedial ? { background: 'linear-gradient(135deg, #dc2626, #ef4444)' } : {}}>
+      <section className="hero-panel" style={isNeedsAttention ? { background: 'linear-gradient(135deg, #dc2626, #ef4444)' } : {}}>
         <div style={{ zIndex: 2 }}>
           <p className="eyebrow">Prediksi Model AI (Random Forest)</p>
           <h2>{diffLabel}</h2>
           <p style={{ fontSize: '15px', lineHeight: '1.6', opacity: 0.95 }}>{dashboard.recommendation.reason}</p>
-          {isRemedial && (
+          {isNeedsAttention && (
             <Link to="/materials" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', marginTop: '16px', padding: '10px 20px', background: 'rgba(255,255,255,0.2)', borderRadius: '10px', color: '#fff', textDecoration: 'none', fontWeight: '700', fontSize: '14px', backdropFilter: 'blur(4px)' }}>
               <Sparkles size={16} /> Mulai perbaikan sekarang <ArrowRight size={16} />
             </Link>
@@ -174,8 +174,8 @@ export function Dashboard() {
           <div className="panel-heading">
             <h2>Topik Rekomendasi</h2>
             <span style={{
-              backgroundColor: isRemedial ? 'rgba(239, 68, 68, 0.1)' : 'rgba(16, 185, 129, 0.1)',
-              color: isRemedial ? 'var(--danger)' : 'var(--success)',
+              backgroundColor: isNeedsAttention ? 'rgba(239, 68, 68, 0.1)' : 'rgba(16, 185, 129, 0.1)',
+              color: isNeedsAttention ? 'var(--danger)' : 'var(--success)',
               padding: '6px 12px', borderRadius: '8px', fontWeight: '700',
             }}>
               {diffLabel}

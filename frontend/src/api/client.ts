@@ -43,3 +43,47 @@ export const submitQuiz = async (studentId: string, payload: QuizSubmission): Pr
   const response = await apiClient.post<QuizResult>(`/students/${studentId}/submit_quiz`, payload);
   return response.data;
 };
+
+export const updateStudentProfile = async (
+  username: string, 
+  sleepHours: number, 
+  stressLevel: number,
+  age: number = 20,
+  gender: string = "Female",
+  internetAccess: string = "Yes",
+  familyIncome: string = "Medium",
+  parentEdu: string = "High School",
+  extracurricular: string = "No"
+) => {
+  const token = localStorage.getItem('token')
+  const response = await axios.post(
+    `http://localhost:8000/api/v1/students/${username}/profile`,
+    { 
+      sleep_hours: sleepHours, 
+      stress_level: stressLevel,
+      age: age,
+      gender: gender,
+      internet_access: internetAccess,
+      family_income: familyIncome,
+      parent_edu: parentEdu,
+      extracurricular: extracurricular
+    },
+    { headers: { Authorization: `Bearer ${token}` } }
+  )
+  return response.data
+};
+
+export const completeMaterial = async (studentId: string, materialId: string) => {
+  const response = await apiClient.post(`/students/${studentId}/complete_material`, { material_id: materialId });
+  return response.data;
+};
+
+export const fetchMaterials = async () => {
+  const response = await apiClient.get('/content/materials');
+  return response.data;
+};
+
+export const fetchQuizzes = async () => {
+  const response = await apiClient.get('/content/quizzes');
+  return response.data;
+};

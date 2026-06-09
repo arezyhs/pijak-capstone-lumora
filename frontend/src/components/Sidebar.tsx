@@ -1,4 +1,4 @@
-import { Activity, BookOpen, Brain, LogOut, Users, FileText } from 'lucide-react'
+import { Activity, BookOpen, Brain, LogOut, Users, FileText, User } from 'lucide-react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 
 export function Sidebar() {
@@ -42,6 +42,12 @@ export function Sidebar() {
             <Users size={18} /> Monitoring Guru
           </Link>
         )}
+
+        <div style={{ margin: '12px 0', borderBottom: '1px solid var(--border)' }} />
+        
+        <Link className={location.pathname === '/profile' ? 'active' : ''} to="/profile">
+          <User size={18} /> Profil Saya
+        </Link>
       </nav>
 
       <div style={{ padding: '1rem', borderTop: '1px solid #e5e7eb', marginTop: 'auto' }}>

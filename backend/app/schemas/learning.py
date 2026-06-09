@@ -12,7 +12,29 @@ class RecommendationRequest(BaseModel):
     subject: str
     quiz_score: float = Field(ge=0, le=100)
     completion_rate: float = Field(ge=0, le=1)
+    sleep_hours: float = 7.0
+    stress_level: int = 5
+    age: int = 20
+    gender: str = "Female"
+    internet_access: str = "Yes"
+    family_income: str = "Medium"
+    parent_edu: str = "High School"
+    extracurricular: str = "No"
     weak_topics: list[str] = []
+
+class MaterialCompletionRequest(BaseModel):
+    material_id: str
+
+
+class UpdateProfileRequest(BaseModel):
+    sleep_hours: float = Field(ge=0, le=24)
+    stress_level: int = Field(ge=1, le=10)
+    age: int = Field(ge=10, le=60)
+    gender: str
+    internet_access: str
+    family_income: str
+    parent_edu: str
+    extracurricular: str
 
 
 class RecommendationResponse(BaseModel):

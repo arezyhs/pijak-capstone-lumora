@@ -13,9 +13,12 @@ from app.schemas.learning import (
     RecommendationResponse,
     TeacherOverview,
     QuizSubmission,
-    QuizResult
+    QuizResult,
+    UpdateProfileRequest,
+    MaterialCompletionRequest
 )
 from app.services.recommender import recommend_learning_path
+from app.models.student import Student, QuizProgress, MaterialProgress
 
 router = APIRouter()
 
@@ -39,6 +42,38 @@ def seed_student_if_needed(db: Session, student_id: str):
 def create_recommendation(payload: RecommendationRequest) -> RecommendationResponse:
     return recommend_learning_path(payload)
 
+@router.post("/students/{student_id}/complete_material")
+def complete_material(student_id: str, payload: MaterialCompletionRequest, db: Session = Depends(get_db), current_user: User = Depends(require_role("student"))):
+    student = seed_student_if_needed(db, student_id)
+    
+    # Check if already completed
+    existing = db.query(MaterialProgress).filter(
+        MaterialProgress.student_id == student.id,
+        MaterialProgress.material_id == payload.material_id
+    ).first()
+    
+    if not existing:
+        progress = MaterialProgress(student_id=student.id, material_id=payload.material_id)
+        db.add(progress)
+        db.commit()
+    
+    return {"message": "Materi ditandai selesai"}
+
+@router.post("/students/{student_id}/profile")
+def update_student_profile(student_id: str, payload: UpdateProfileRequest, db: Session = Depends(get_db), current_user: User = Depends(require_role("student"))):
+    student = seed_student_if_needed(db, student_id)
+    student.sleep_hours = payload.sleep_hours
+    student.stress_level = payload.stress_level
+    student.age = payload.age
+    student.gender = payload.gender
+    student.internet_access = payload.internet_access
+    student.family_income = payload.family_income
+    student.parent_edu = payload.parent_edu
+    student.extracurricular = payload.extracurricular
+    
+    db.commit()
+    return {"message": "Profil berhasil diperbarui"}
+
 
 @router.post("/students/{student_id}/submit_quiz", response_model=QuizResult)
 def submit_quiz(student_id: str, payload: QuizSubmission, db: Session = Depends(get_db), current_user: User = Depends(require_role("student"))) -> QuizResult:
@@ -49,14 +84,25 @@ def submit_quiz(student_id: str, payload: QuizSubmission, db: Session = Depends(
     db.add(new_quiz)
     db.commit()
     
+    # Calculate dynamic completion rate
+    completed_materials_count = db.query(MaterialProgress).filter(MaterialProgress.student_id == student.id).count()
+    completion_rate = min(1.0, completed_materials_count / 9.0) # Assume 9 total materials for MVP
+    
     # Trigger AI recommender to get the new path difficulty
-    completion_rate = 0.50 # proxy
     recommendation = recommend_learning_path(
         RecommendationRequest(
             student_id=student_id,
             subject=payload.subject,
             quiz_score=payload.score,
             completion_rate=completion_rate,
+            sleep_hours=student.sleep_hours,
+            stress_level=student.stress_level,
+            age=student.age,
+            gender=student.gender,
+            internet_access=student.internet_access,
+            family_income=student.family_income,
+            parent_edu=student.parent_edu,
+            extracurricular=student.extracurricular,
             weak_topics=[payload.subject],
         )
     )
@@ -82,18 +128,41 @@ def get_student_dashboard(student_id: str, db: Session = Depends(get_db), curren
     all_quizzes = db.query(QuizProgress).filter(QuizProgress.student_id == student.id).all()
     avg_score = sum(q.score for q in all_quizzes) / len(all_quizzes)
     
-    completion_rate = 0.50 # Hardcoded completion rate proxy for MVP
+    # Calculate dynamic completion rate
+    completed_materials_count = db.query(MaterialProgress).filter(MaterialProgress.student_id == student.id).count()
+    completion_rate = min(1.0, completed_materials_count / 9.0) # Assume 9 total materials for MVP
 
     # 4. Trigger AI Recommender
     recommendation = recommend_learning_path(
         RecommendationRequest(
             student_id=student_id,
             subject=latest_quiz_record.subject,
-            quiz_score=latest_quiz_record.score,
+            quiz_score=avg_score,
             completion_rate=completion_rate,
+            sleep_hours=student.sleep_hours,
+            stress_level=student.stress_level,
+            age=student.age,
+            gender=student.gender,
+            internet_access=student.internet_access,
+            family_income=student.family_income,
+            parent_edu=student.parent_edu,
+            extracurricular=student.extracurricular,
             weak_topics=[latest_quiz_record.subject],
         )
     )
+
+    # Create dynamic learning path based on recommendation difficulty
+    path_steps = []
+    if recommendation.difficulty == "Fast-Track Program":
+        path_steps = ["Ambil Tantangan Ekstra", "Evaluasi Akhir Modul", "Sertifikasi Terselesaikan"]
+    elif recommendation.difficulty == "Visual Learning Path":
+        path_steps = ["Tonton Video Rangkuman", "Latihan Visual", "Ujian Ulang Visual"]
+    elif recommendation.difficulty == "Microlearning Mode":
+        path_steps = ["Manajemen Stres", "Microlearning 5 Menit", "Kuis Singkat Santai"]
+    elif recommendation.difficulty == "Fundamental Level":
+        path_steps = [f"Review Dasar {latest_quiz_record.subject}", "Latihan Terbimbing", "Evaluasi Ulang"]
+    else:
+        path_steps = [f"Pelajari Modul Inti {latest_quiz_record.subject}", "Latihan Mandiri", "Evaluasi Menengah"]
 
     return DashboardResponse(
         student_id=student_id,
@@ -105,24 +174,41 @@ def get_student_dashboard(student_id: str, db: Session = Depends(get_db), curren
             submitted_at=latest_quiz_record.submitted_at.isoformat()
         ),
         recommendation=recommendation,
-        learning_path=[
-            f"Review {latest_quiz_record.subject}",
-            "Latihan Soal Lanjutan",
-            f"Evaluasi AI Tingkat {recommendation.difficulty.capitalize()}"
-        ],
+        learning_path=path_steps,
     )
 
 
 @router.get("/teacher/overview", response_model=TeacherOverview)
 def get_teacher_overview(db: Session = Depends(get_db), current_user: User = Depends(require_role("teacher"))) -> TeacherOverview:
-    total_students = db.query(Student).count()
+    students = db.query(Student).all()
+    total_students = len(students)
+    
     if total_students == 0:
-        total_students = 32 # Dummy fallback
+        return TeacherOverview(
+            total_students=0,
+            average_completion_rate=0.0,
+            average_score=0.0,
+            risk_topics=[],
+            students_need_attention=[]
+        )
         
+    all_quizzes = db.query(QuizProgress).all()
+    avg_score = sum(q.score for q in all_quizzes) / len(all_quizzes) if all_quizzes else 0.0
+    
+    all_materials = db.query(MaterialProgress).count()
+    avg_completion = min(1.0, (all_materials / (total_students * 9.0)))
+    
+    attention_students = []
+    for s in students:
+        s_quizzes = [q.score for q in all_quizzes if q.student_id == s.id]
+        s_avg_score = sum(s_quizzes) / len(s_quizzes) if s_quizzes else 100
+        if s.stress_level >= 8 or s_avg_score < 60:
+            attention_students.append(f"{s.name} ({s.user_id}) - Stres: {s.stress_level}/10, Skor: {s_avg_score:.1f}")
+
     return TeacherOverview(
         total_students=total_students,
-        average_completion_rate=0.69,
-        average_score=74.2,
-        risk_topics=["Pecahan", "Persamaan Linear", "Statistika Dasar"],
-        students_need_attention=["student-123", "student-014", "student-027"],
+        average_completion_rate=avg_completion,
+        average_score=avg_score,
+        risk_topics=["Logika", "Matematika"], # Simplified for MVP
+        students_need_attention=attention_students,
     )
