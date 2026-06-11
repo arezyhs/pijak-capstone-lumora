@@ -1,4 +1,5 @@
 from pydantic import BaseModel, Field
+from typing import Optional
 
 
 class Material(BaseModel):
@@ -83,3 +84,21 @@ class QuizResult(BaseModel):
     message: str
     quiz_score: float
     new_difficulty: str
+
+
+class QuizHistoryItem(BaseModel):
+    id: int
+    subject: str
+    score: float
+    submitted_at: str
+
+
+class StudentHistoryResponse(BaseModel):
+    student_id: str
+    name: str
+    quiz_history: list[QuizHistoryItem]
+    total_quizzes: int
+    average_score: float
+    highest_score: float
+    lowest_score: float
+    score_by_subject: dict[str, float]  # subject -> avg score per subject

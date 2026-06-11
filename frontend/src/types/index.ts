@@ -51,3 +51,21 @@ export interface QuizResult {
   quiz_score: number;
   new_difficulty: string;
 }
+
+export interface QuizHistoryItem {
+  id: number;
+  subject: string;
+  score: number;
+  submitted_at: string;
+}
+
+export interface StudentHistoryResponse {
+  student_id: string;
+  name: string;
+  quiz_history: QuizHistoryItem[];
+  total_quizzes: number;
+  average_score: number;
+  highest_score: number;
+  lowest_score: number;
+  score_by_subject: Record<string, number>;
+}

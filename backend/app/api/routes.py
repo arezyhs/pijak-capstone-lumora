@@ -15,7 +15,9 @@ from app.schemas.learning import (
     QuizSubmission,
     QuizResult,
     UpdateProfileRequest,
-    MaterialCompletionRequest
+    MaterialCompletionRequest,
+    QuizHistoryItem,
+    StudentHistoryResponse,
 )
 from app.services.recommender import recommend_learning_path
 from app.models.student import Student, QuizProgress, MaterialProgress
@@ -175,6 +177,62 @@ def get_student_dashboard(student_id: str, db: Session = Depends(get_db), curren
         ),
         recommendation=recommendation,
         learning_path=path_steps,
+    )
+
+
+@router.get("/students/{student_id}/history", response_model=StudentHistoryResponse)
+def get_student_history(
+    student_id: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_role("student"))
+) -> StudentHistoryResponse:
+    student = seed_student_if_needed(db, student_id)
+    all_quizzes = db.query(QuizProgress).filter(
+        QuizProgress.student_id == student.id
+    ).order_by(QuizProgress.submitted_at.desc()).all()
+
+    if not all_quizzes:
+        return StudentHistoryResponse(
+            student_id=student_id,
+            name=student.name,
+            quiz_history=[],
+            total_quizzes=0,
+            average_score=0.0,
+            highest_score=0.0,
+            lowest_score=0.0,
+            score_by_subject={},
+        )
+
+    scores = [q.score for q in all_quizzes]
+    avg_score = sum(scores) / len(scores)
+    highest = max(scores)
+    lowest = min(scores)
+
+    # Group by subject -> average per subject
+    subject_scores: dict[str, list[float]] = {}
+    for q in all_quizzes:
+        subject_scores.setdefault(q.subject, []).append(q.score)
+    score_by_subject = {subj: round(sum(v) / len(v), 1) for subj, v in subject_scores.items()}
+
+    history_items = [
+        QuizHistoryItem(
+            id=q.id,
+            subject=q.subject,
+            score=q.score,
+            submitted_at=q.submitted_at.strftime("%d %b %Y, %H:%M")
+        )
+        for q in all_quizzes
+    ]
+
+    return StudentHistoryResponse(
+        student_id=student_id,
+        name=student.name,
+        quiz_history=history_items,
+        total_quizzes=len(all_quizzes),
+        average_score=round(avg_score, 1),
+        highest_score=highest,
+        lowest_score=lowest,
+        score_by_subject=score_by_subject,
     )
 
 

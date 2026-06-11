@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { DashboardResponse, TeacherOverview, QuizSubmission, QuizResult } from '../types';
+import type { DashboardResponse, TeacherOverview, QuizSubmission, QuizResult, StudentHistoryResponse } from '../types';
 
 const apiClient = axios.create({
   baseURL: 'http://localhost:8000/api/v1',
@@ -85,5 +85,10 @@ export const fetchMaterials = async () => {
 
 export const fetchQuizzes = async () => {
   const response = await apiClient.get('/content/quizzes');
+  return response.data;
+};
+
+export const fetchStudentHistory = async (studentId: string): Promise<StudentHistoryResponse> => {
+  const response = await apiClient.get<StudentHistoryResponse>(`/students/${studentId}/history`);
   return response.data;
 };
