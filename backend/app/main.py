@@ -7,10 +7,18 @@ from app.api.content import router as content_router
 from app.core.config import settings
 from app.core.database import Base, engine
 from app.models import student
+from app.models import content
+from app.core.init_db import seed_data
+from contextlib import asynccontextmanager
 
 Base.metadata.create_all(bind=engine)
 
-app = FastAPI(title=settings.app_name)
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    seed_data()
+    yield
+
+app = FastAPI(title=settings.app_name, lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
