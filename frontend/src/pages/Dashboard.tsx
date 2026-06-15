@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts'
-import { updateStudentCondition, fetchMaterials, fetchQuizzes, fetchStudentDashboard, fetchStudentHistory } from '../api/client'
+import { fetchMaterials, fetchQuizzes, fetchStudentDashboard, fetchStudentHistory } from '../api/client'
 import {
   Activity,
   AlertTriangle,
@@ -124,10 +124,6 @@ export function Dashboard() {
   const [quizzes, setQuizzes] = useState<QuizModule[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [showSurvey, setShowSurvey] = useState(false)
-  const [sleepHours, setSleepHours] = useState(7)
-  const [stressLevel, setStressLevel] = useState(5)
-  const [surveyLoading, setSurveyLoading] = useState(false)
 
   useEffect(() => {
     const loadData = async () => {
@@ -248,21 +244,18 @@ export function Dashboard() {
           <h1>Dashboard Pembelajaran</h1>
         </div>
         <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-          <button onClick={() => setShowSurvey(true)} className="btn-outline" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <Activity size={18} /> Perbarui Kondisi
-          </button>
           <Link to="/materials" className="btn-outline" style={{ display: 'flex', alignItems: 'center', gap: '6px', textDecoration: 'none' }}>
-            <BookOpen size={18} /> Materi
+            <BookOpen size={18} /> Baca Materi
           </Link>
           <Link to="/quiz" className="btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '6px', textDecoration: 'none' }}>
-            <ClipboardCheck size={18} /> Mulai Ujian
+            <ClipboardCheck size={18} /> Mulai Kuis
           </Link>
         </div>
       </header>
 
       <section className="hero-panel" style={isNeedsAttention ? { background: 'rgba(239, 68, 68, 0.05)', borderColor: 'rgba(239, 68, 68, 0.3)' } : {}}>
         <div style={{ zIndex: 2 }}>
-          <p className="eyebrow">Prediksi Model AI</p>
+          <p className="eyebrow">Kata AI</p>
           <h2>{dashboard.recommendation.difficulty}</h2>
           <p style={{ fontSize: '15px', lineHeight: '1.6', opacity: 0.95 }}>
             {dashboard.recommendation.reason}
@@ -526,74 +519,6 @@ export function Dashboard() {
         </div>
       </section>
 
-      {/* Survey Modal */}
-      {showSurvey && (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.6)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000, padding: '20px' }}>
-          <div className="panel" style={{ width: '100%', maxWidth: '440px', padding: '24px' }}>
-            <h2 style={{ fontSize: '20px', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Activity size={20} color="var(--accent-primary)" /> Kuesioner Harian
-            </h2>
-            <p style={{ color: 'var(--muted)', fontSize: '14px', marginBottom: '20px' }}>
-              Perbarui kondisi Anda hari ini agar rekomendasi rute belajar dari AI lebih akurat menyesuaikan kapasitas Anda.
-            </p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-              <div>
-                <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '500' }}>Waktu Tidur Semalam (Jam)</label>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                  <input 
-                    type="range" min="3" max="12" value={sleepHours} 
-                    onChange={e => setSleepHours(Number(e.target.value))}
-                    style={{ flex: 1, accentColor: 'var(--accent-primary)' }}
-                  />
-                  <strong style={{ width: '40px', textAlign: 'right' }}>{sleepHours}</strong>
-                </div>
-              </div>
-              <div>
-                <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '500' }}>Tingkat Stres / Beban (1-10)</label>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                  <input 
-                    type="range" min="1" max="10" value={stressLevel} 
-                    onChange={e => setStressLevel(Number(e.target.value))}
-                    style={{ flex: 1, accentColor: 'var(--danger)' }}
-                  />
-                  <strong style={{ width: '40px', textAlign: 'right' }}>{stressLevel}</strong>
-                </div>
-              </div>
-              <div style={{ display: 'flex', gap: '12px', marginTop: '12px' }}>
-                <button 
-                  onClick={() => setShowSurvey(false)} 
-                  className="btn-outline" style={{ flex: 1 }}
-                >
-                  Batal
-                </button>
-                <button 
-                  disabled={surveyLoading}
-                  onClick={async () => {
-                    setSurveyLoading(true);
-                    try {
-                      const username = localStorage.getItem('username') || 'student1';
-                      await updateStudentCondition(username, sleepHours, stressLevel);
-                      localStorage.setItem('sleepHours', sleepHours.toString());
-                      localStorage.setItem('stressLevel', stressLevel.toString());
-                      setShowSurvey(false);
-                      // Force reload dashboard to trigger AI recommendation again
-                      window.location.reload();
-                    } catch (err) {
-                      console.error(err);
-                      alert('Gagal memperbarui kondisi.');
-                    } finally {
-                      setSurveyLoading(false);
-                    }
-                  }} 
-                  className="btn-primary" style={{ flex: 1 }}
-                >
-                  {surveyLoading ? 'Menyimpan...' : 'Simpan & Update AI'}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   )
 }

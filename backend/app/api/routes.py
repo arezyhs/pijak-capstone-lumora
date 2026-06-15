@@ -110,6 +110,12 @@ def complete_material(student_id: str, payload: MaterialCompletionRequest, db: S
     
     return {"message": "Materi ditandai selesai"}
 
+@router.get("/students/{student_id}/completed_materials", response_model=list[str])
+def get_completed_materials(student_id: str, db: Session = Depends(get_db), current_user: User = Depends(require_role("student"))):
+    student = seed_student_if_needed(db, student_id)
+    progress = db.query(MaterialProgress).filter(MaterialProgress.student_id == student.id).all()
+    return [p.material_id for p in progress]
+
 @router.post("/students/{student_id}/profile")
 def update_student_profile(student_id: str, payload: UpdateProfileRequest, db: Session = Depends(get_db), current_user: User = Depends(require_role("student"))):
     student = seed_student_if_needed(db, student_id)

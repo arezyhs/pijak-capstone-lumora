@@ -70,9 +70,9 @@ export function OnboardingView() {
           }}>
             <Brain size={32} />
           </div>
-          <h1 style={{ fontSize: '24px', color: 'var(--ink)' }}>Personalisasi AI Anda</h1>
+          <h1 style={{ fontSize: '24px', color: 'var(--ink)' }}>Kenalan Dulu Yuk!</h1>
           <p style={{ color: 'var(--muted)', marginTop: '8px', lineHeight: '1.5' }}>
-            Lumora membutuhkan data perilaku dan demografi Anda agar rekomendasi pembelajaran benar-benar disesuaikan dengan kondisi real Anda.
+            Lumora butuh sedikit info tentang keseharian kamu biar AI-nya bisa ngasih materi yang bener-bener pas buat kondisi kamu sekarang.
           </p>
         </div>
 
@@ -194,27 +194,23 @@ export function OnboardingView() {
 
           <button 
             type="submit" 
+            className="btn-primary" 
             disabled={loading}
-            style={{ 
+            style={{
               marginTop: '16px',
               width: '100%', 
               display: 'flex', 
               justifyContent: 'center', 
               alignItems: 'center', 
               gap: '8px', 
-              background: 'var(--accent-primary)', 
-              color: 'white', 
-              border: 'none', 
-              padding: '16px', 
               borderRadius: '12px', 
               fontSize: '16px', 
               fontWeight: '600',
-              cursor: loading ? 'not-allowed' : 'pointer',
-              opacity: loading ? 0.7 : 1,
-              transition: 'all 0.2s'
-            }}>
+              padding: '16px'
+            }}
+          >
             {loading ? <Loader2 size={20} className="spinner" /> : (
-              <>Simpan Profil AI & Mulai Belajar <ArrowRight size={20} /></>
+              <>Mulai Belajar Sekarang <ArrowRight size={20} /></>
             )}
           </button>
         </form>

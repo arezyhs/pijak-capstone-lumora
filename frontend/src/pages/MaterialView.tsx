@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { PlayCircle, FileText, CheckCircle2, ArrowLeft, BookOpen, Clock, ChevronRight, Tags } from 'lucide-react'
-import { completeMaterial, fetchMaterials } from '../api/client'
+import { completeMaterial, fetchMaterials, fetchCompletedMaterials } from '../api/client'
 
 // --- Data Types ---
 type MaterialItem = {
@@ -79,11 +79,19 @@ export function MaterialView() {
   useEffect(() => {
     const loadMaterials = async () => {
       try {
-        const data = await fetchMaterials()
+        const username = localStorage.getItem('username') || 'student1';
+        const [data, completedIds] = await Promise.all([
+          fetchMaterials(),
+          fetchCompletedMaterials(username).catch(() => [] as string[])
+        ]);
+        
         // Ensure all fetched materials have a 'completed' field initialized
         const processedData = data.map((cat: any) => ({
           ...cat,
-          materials: cat.materials.map((m: any) => ({ ...m, completed: false }))
+          materials: cat.materials.map((m: any) => ({ 
+            ...m, 
+            completed: completedIds.includes(m.id) 
+          }))
         }))
         setMaterials(processedData)
       } catch (err) {
@@ -126,17 +134,17 @@ export function MaterialView() {
         <nav className="reader-nav">
           <button className="reader-back" onClick={() => setActiveMaterial(null)}>
             <ArrowLeft size={18} />
-            <span>Kembali ke {currentCat.name}</span>
+            <span>Balik ke {currentCat.name}</span>
           </button>
           {!activeMaterial.completed && (
             <button className="btn-primary" style={{ padding: '8px 20px', fontSize: '14px' }} onClick={() => markCompleted(currentCat.id, activeMaterial.id)}>
               <CheckCircle2 size={16} style={{ marginRight: '6px', verticalAlign: 'middle' }} />
-              Tandai Selesai
+              Udah Kelar!
             </button>
           )}
           {activeMaterial.completed && (
             <span className="reader-badge-done">
-              <CheckCircle2 size={16} /> Selesai
+              <CheckCircle2 size={16} /> Beres!
             </span>
           )}
         </nav>
@@ -207,13 +215,13 @@ export function MaterialView() {
       <div className="content">
         <header className="topbar">
           <div>
-            <p className="eyebrow">Perpustakaan Cerdas</p>
-            <h1>Materi Belajar</h1>
+            <p className="eyebrow">Perpustakaan Pintar</p>
+            <h1>Kumpulan Materi Belajar</h1>
           </div>
         </header>
 
         <p style={{ color: 'var(--muted)', fontSize: '15px', maxWidth: '560px', marginBottom: '8px' }}>
-          Pilih kategori pelajaran untuk mulai belajar. Setiap kategori berisi artikel lengkap dan simulasi video yang dirancang untuk mendukung kurikulum AI Anda.
+          Pilih kategori pelajaran di bawah buat mulai belajar. Isinya udah diracik sama AI khusus buat bantu kamu makin paham!
         </p>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px' }}>
@@ -263,10 +271,10 @@ export function MaterialView() {
       <header className="topbar">
         <div>
           <p className="eyebrow">{currentCat!.name}</p>
-          <h1>Daftar Materi</h1>
+          <h1>Mau Belajar Apa Hari Ini?</h1>
         </div>
         <button className="btn-outline" style={{ display: 'flex', alignItems: 'center', gap: '6px' }} onClick={() => setActiveCategory(null)}>
-          <ArrowLeft size={16} /> Semua Kategori
+          <ArrowLeft size={16} /> Balik ke Kategori
         </button>
       </header>
 

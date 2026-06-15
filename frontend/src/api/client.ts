@@ -121,6 +121,11 @@ export const fetchMaterials = async () => {
   return response.data;
 };
 
+export const fetchCompletedMaterials = async (studentId: string): Promise<string[]> => {
+  const response = await apiClient.get<string[]>(`/students/${studentId}/completed_materials`);
+  return response.data;
+};
+
 export const fetchQuizzes = async () => {
   const response = await apiClient.get('/content/quizzes');
   return response.data;
