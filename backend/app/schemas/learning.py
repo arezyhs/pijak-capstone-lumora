@@ -148,11 +148,18 @@ class QuizHistoryItem(BaseModel):
     score: float
     submitted_at: str
 
+class ConditionHistoryItem(BaseModel):
+    id: int
+    sleep_hours: float
+    stress_level: int
+    logged_at: str
+
 
 class StudentHistoryResponse(BaseModel):
     student_id: str
     name: str
     quiz_history: list[QuizHistoryItem]
+    condition_history: list[ConditionHistoryItem]
     total_quizzes: int
     average_score: float
     highest_score: float

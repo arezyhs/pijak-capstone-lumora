@@ -9,6 +9,7 @@ import jwt
 
 from app.core.database import get_db
 from app.models.user import User
+from app.models.student import Student
 from pydantic import BaseModel
 
 # --- Configuration ---
@@ -27,6 +28,15 @@ class Token(BaseModel):
     token_type: str
     role: str
     username: str
+    name: str
+    created_at: str
+    has_completed_onboarding: bool
+
+class RegisterRequest(BaseModel):
+    username: str
+    password: str
+    name: str
+    role: str
 
 # --- Utility Functions ---
 def verify_password(plain_password, hashed_password):
@@ -75,21 +85,49 @@ def require_role(required_role: str):
         return current_user
     return role_dependency
 
-# --- Seeder ---
-def seed_users(db: Session):
-    if not db.query(User).filter(User.username == "student1").first():
-        student = User(username="student1", hashed_password=get_password_hash("password123"), role="student")
-        db.add(student)
-    if not db.query(User).filter(User.username == "teacher1").first():
-        teacher = User(username="teacher1", hashed_password=get_password_hash("password123"), role="teacher")
-        db.add(teacher)
-    db.commit()
-
 # --- Routes ---
+@router.post("/register", response_model=Token)
+def register_user(payload: RegisterRequest, db: Session = Depends(get_db)):
+    if payload.role not in ["student", "teacher"]:
+        raise HTTPException(status_code=400, detail="Invalid role")
+        
+    existing_user = db.query(User).filter(User.username == payload.username).first()
+    if existing_user:
+        raise HTTPException(status_code=400, detail="Username already registered")
+        
+    user = User(
+        username=payload.username,
+        name=payload.name,
+        hashed_password=get_password_hash(payload.password),
+        role=payload.role
+    )
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(
+        data={"sub": user.username, "role": user.role}, expires_delta=access_token_expires
+    )
+    
+    has_onboarding = False
+    if user.role == "student":
+        student = db.query(Student).filter(Student.user_id == user.username).first()
+        if student:
+            has_onboarding = student.has_completed_onboarding
+            
+    return {
+        "access_token": access_token, 
+        "token_type": "bearer", 
+        "role": user.role, 
+        "username": user.username, 
+        "name": user.name,
+        "created_at": user.created_at.isoformat() if user.created_at else "",
+        "has_completed_onboarding": has_onboarding
+    }
+
 @router.post("/login", response_model=Token)
 def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
-    seed_users(db) # Auto-seed for MVP
-    
     user = db.query(User).filter(User.username == form_data.username).first()
     if not user or not verify_password(form_data.password, user.hashed_password):
         raise HTTPException(
@@ -102,4 +140,19 @@ def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db:
     access_token = create_access_token(
         data={"sub": user.username, "role": user.role}, expires_delta=access_token_expires
     )
-    return {"access_token": access_token, "token_type": "bearer", "role": user.role, "username": user.username}
+    
+    has_onboarding = False
+    if user.role == "student":
+        student = db.query(Student).filter(Student.user_id == user.username).first()
+        if student:
+            has_onboarding = student.has_completed_onboarding
+            
+    return {
+        "access_token": access_token, 
+        "token_type": "bearer", 
+        "role": user.role, 
+        "username": user.username, 
+        "name": user.name or user.username,
+        "created_at": user.created_at.isoformat() if user.created_at else "",
+        "has_completed_onboarding": has_onboarding
+    }

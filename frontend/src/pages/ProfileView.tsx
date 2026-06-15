@@ -5,7 +5,10 @@ import type { StudentHistoryResponse } from '../types'
 
 export function ProfileView() {
   const role = localStorage.getItem('role') || 'student'
-  const username = localStorage.getItem('username') || 'student1'
+  const username = localStorage.getItem('username') || ''
+  const name = localStorage.getItem('name') || username
+  const rawCreatedAt = localStorage.getItem('created_at') || ''
+  const createdAt = rawCreatedAt ? new Date(rawCreatedAt).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' }) : 'Hari Ini'
   const isTeacher = role === 'teacher'
 
   const [history, setHistory] = useState<StudentHistoryResponse | null>(null)
@@ -54,7 +57,7 @@ export function ProfileView() {
           </div>
           <div>
             <h2 style={{ fontSize: '28px', color: 'var(--ink)', marginBottom: '4px' }}>
-              {username === 'student1' ? 'Budi Santoso' : username === 'teacher1' ? 'Pak Andi' : username}
+              {name}
             </h2>
             <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
               <span style={{
@@ -65,7 +68,7 @@ export function ProfileView() {
               }}>
                 {isTeacher ? 'Guru Pembimbing' : 'Siswa Aktif'}
               </span>
-              <span style={{ color: 'var(--muted)', fontSize: '14px' }}>Bergabung sejak: Agustus 2023</span>
+              <span style={{ color: 'var(--muted)', fontSize: '14px' }}>Bergabung sejak: {createdAt}</span>
             </div>
           </div>
         </section>
@@ -237,7 +240,7 @@ export function ProfileView() {
               )}
 
               {/* Badges */}
-              <section className="panel" style={{ background: 'linear-gradient(to bottom, #ffffff, var(--surface-alt))' }}>
+              <section className="panel" style={{ background: 'linear-gradient(to bottom, var(--surface), var(--surface-alt))' }}>
                 <div className="panel-heading">
                   <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '16px' }}>
                     <Award size={20} color="var(--warning)" /> Lencana Prestasi
@@ -245,7 +248,7 @@ export function ProfileView() {
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '16px' }}>
                   {history && history.highest_score >= 80 && (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px', background: '#fff', borderRadius: '12px', border: '1px solid var(--border)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px', background: 'var(--surface)', borderRadius: '12px', border: '1px solid var(--border)' }}>
                       <div style={{ width: '40px', height: '40px', background: 'rgba(245, 158, 11, 0.1)', color: 'var(--warning)', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                         <Award size={20} />
                       </div>
@@ -256,7 +259,7 @@ export function ProfileView() {
                     </div>
                   )}
                   {history && history.total_quizzes >= 3 && (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px', background: '#fff', borderRadius: '12px', border: '1px solid var(--border)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px', background: 'var(--surface)', borderRadius: '12px', border: '1px solid var(--border)' }}>
                       <div style={{ width: '40px', height: '40px', background: 'var(--accent-glow)', color: 'var(--accent-primary)', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                         <Hash size={20} />
                       </div>

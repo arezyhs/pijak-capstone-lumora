@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts'
+import { updateStudentCondition, fetchMaterials, fetchQuizzes, fetchStudentDashboard, fetchStudentHistory } from '../api/client'
 import {
   Activity,
   AlertTriangle,
@@ -19,7 +21,6 @@ import {
   TrendingDown,
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { fetchMaterials, fetchQuizzes, fetchStudentDashboard, fetchStudentHistory } from '../api/client'
 import type { DashboardResponse, StudentHistoryResponse } from '../types'
 
 type MaterialItem = {
@@ -123,6 +124,10 @@ export function Dashboard() {
   const [quizzes, setQuizzes] = useState<QuizModule[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [showSurvey, setShowSurvey] = useState(false)
+  const [sleepHours, setSleepHours] = useState(7)
+  const [stressLevel, setStressLevel] = useState(5)
+  const [surveyLoading, setSurveyLoading] = useState(false)
 
   useEffect(() => {
     const loadData = async () => {
@@ -176,6 +181,26 @@ export function Dashboard() {
       .slice(0, 5)
   }, [dashboard, materials, weakSubjects])
 
+  const quizChartData = useMemo(() => {
+    if (!history?.quiz_history) return [];
+    return history.quiz_history.map((q, i) => ({
+      name: `Kuis ${i+1}`,
+      date: new Date(q.submitted_at).toLocaleDateString('id-ID', { month: 'short', day: 'numeric' }),
+      score: q.score,
+      subject: q.subject
+    }));
+  }, [history]);
+
+  const conditionChartData = useMemo(() => {
+    if (!history?.condition_history) return [];
+    return history.condition_history.map((c, i) => ({
+      name: `Hari ${i+1}`,
+      date: new Date(c.logged_at).toLocaleDateString('id-ID', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
+      stress: c.stress_level,
+      sleep: c.sleep_hours
+    }));
+  }, [history]);
+
   const targetQuiz = useMemo(() => {
     if (!dashboard) return null
     const recommendedTags = new Set(dashboard.recommendation.recommended_tags.map(normalizeTag))
@@ -223,6 +248,9 @@ export function Dashboard() {
           <h1>Dashboard Pembelajaran</h1>
         </div>
         <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+          <button onClick={() => setShowSurvey(true)} className="btn-outline" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <Activity size={18} /> Perbarui Kondisi
+          </button>
           <Link to="/materials" className="btn-outline" style={{ display: 'flex', alignItems: 'center', gap: '6px', textDecoration: 'none' }}>
             <BookOpen size={18} /> Materi
           </Link>
@@ -232,7 +260,7 @@ export function Dashboard() {
         </div>
       </header>
 
-      <section className="hero-panel" style={isNeedsAttention ? { background: 'linear-gradient(135deg, #b91c1c, #ef4444)' } : {}}>
+      <section className="hero-panel" style={isNeedsAttention ? { background: 'rgba(239, 68, 68, 0.05)', borderColor: 'rgba(239, 68, 68, 0.3)' } : {}}>
         <div style={{ zIndex: 2 }}>
           <p className="eyebrow">Prediksi Model AI</p>
           <h2>{dashboard.recommendation.difficulty}</h2>
@@ -359,6 +387,63 @@ export function Dashboard() {
         </section>
       </div>
 
+      <div className="workspace-grid" style={{ marginBottom: '24px' }}>
+        <section className="panel">
+          <div className="panel-heading">
+            <h2 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <TrendingDown size={20} color="var(--accent-primary)" /> Visualisasi Perkembangan Nilai
+            </h2>
+          </div>
+          <div style={{ width: '100%', height: 300, marginTop: '20px' }}>
+            {quizChartData.length > 0 ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={quizChartData} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
+                  <XAxis dataKey="name" stroke="var(--muted)" fontSize={12} tickLine={false} axisLine={false} />
+                  <YAxis stroke="var(--muted)" fontSize={12} tickLine={false} axisLine={false} domain={[0, 100]} />
+                  <Tooltip 
+                    contentStyle={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '8px', color: 'var(--ink)' }}
+                    itemStyle={{ color: 'var(--ink)' }}
+                  />
+                  <Line type="monotone" dataKey="score" name="Skor Kuis" stroke="var(--accent-primary)" strokeWidth={3} dot={{ r: 4, strokeWidth: 2 }} activeDot={{ r: 6 }} />
+                </LineChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="dash-empty-state">Belum ada data kuis untuk divisualisasikan.</div>
+            )}
+          </div>
+        </section>
+
+        <section className="panel">
+          <div className="panel-heading">
+            <h2 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Activity size={20} color="var(--danger)" /> Visualisasi Kondisi Mental & Fisik
+            </h2>
+          </div>
+          <div style={{ width: '100%', height: 300, marginTop: '20px' }}>
+            {conditionChartData.length > 0 ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={conditionChartData} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
+                  <XAxis dataKey="name" stroke="var(--muted)" fontSize={12} tickLine={false} axisLine={false} />
+                  <YAxis yAxisId="left" stroke="var(--danger)" fontSize={12} tickLine={false} axisLine={false} domain={[0, 10]} />
+                  <YAxis yAxisId="right" orientation="right" stroke="var(--warning)" fontSize={12} tickLine={false} axisLine={false} domain={[0, 14]} />
+                  <Tooltip 
+                    contentStyle={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '8px', color: 'var(--ink)' }}
+                    itemStyle={{ color: 'var(--ink)' }}
+                  />
+                  <Legend wrapperStyle={{ fontSize: '13px', paddingTop: '10px' }} />
+                  <Line yAxisId="left" type="monotone" dataKey="stress" name="Tingkat Stres (1-10)" stroke="var(--danger)" strokeWidth={3} dot={{ r: 4 }} activeDot={{ r: 6 }} />
+                  <Line yAxisId="right" type="monotone" dataKey="sleep" name="Waktu Tidur (Jam)" stroke="var(--warning)" strokeWidth={3} dot={{ r: 4 }} activeDot={{ r: 6 }} />
+                </LineChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="dash-empty-state">Belum ada rekam jejak kondisi.</div>
+            )}
+          </div>
+        </section>
+      </div>
+
       <div className="workspace-grid">
         <section className="panel">
           <div className="panel-heading">
@@ -393,7 +478,7 @@ export function Dashboard() {
           </div>
         </section>
 
-        <section className="panel" style={{ background: 'linear-gradient(to bottom, #ffffff, var(--surface-alt))' }}>
+        <section className="panel" style={{ background: 'linear-gradient(to bottom, var(--surface), var(--surface-alt))' }}>
           <div className="panel-heading">
             <h2 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <Lightbulb size={20} color="var(--warning)" /> Tips Belajar Adaptif
@@ -440,6 +525,75 @@ export function Dashboard() {
           </article>
         </div>
       </section>
+
+      {/* Survey Modal */}
+      {showSurvey && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.6)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000, padding: '20px' }}>
+          <div className="panel" style={{ width: '100%', maxWidth: '440px', padding: '24px' }}>
+            <h2 style={{ fontSize: '20px', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Activity size={20} color="var(--accent-primary)" /> Kuesioner Harian
+            </h2>
+            <p style={{ color: 'var(--muted)', fontSize: '14px', marginBottom: '20px' }}>
+              Perbarui kondisi Anda hari ini agar rekomendasi rute belajar dari AI lebih akurat menyesuaikan kapasitas Anda.
+            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              <div>
+                <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '500' }}>Waktu Tidur Semalam (Jam)</label>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                  <input 
+                    type="range" min="3" max="12" value={sleepHours} 
+                    onChange={e => setSleepHours(Number(e.target.value))}
+                    style={{ flex: 1, accentColor: 'var(--accent-primary)' }}
+                  />
+                  <strong style={{ width: '40px', textAlign: 'right' }}>{sleepHours}</strong>
+                </div>
+              </div>
+              <div>
+                <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '500' }}>Tingkat Stres / Beban (1-10)</label>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                  <input 
+                    type="range" min="1" max="10" value={stressLevel} 
+                    onChange={e => setStressLevel(Number(e.target.value))}
+                    style={{ flex: 1, accentColor: 'var(--danger)' }}
+                  />
+                  <strong style={{ width: '40px', textAlign: 'right' }}>{stressLevel}</strong>
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: '12px', marginTop: '12px' }}>
+                <button 
+                  onClick={() => setShowSurvey(false)} 
+                  className="btn-outline" style={{ flex: 1 }}
+                >
+                  Batal
+                </button>
+                <button 
+                  disabled={surveyLoading}
+                  onClick={async () => {
+                    setSurveyLoading(true);
+                    try {
+                      const username = localStorage.getItem('username') || 'student1';
+                      await updateStudentCondition(username, sleepHours, stressLevel);
+                      localStorage.setItem('sleepHours', sleepHours.toString());
+                      localStorage.setItem('stressLevel', stressLevel.toString());
+                      setShowSurvey(false);
+                      // Force reload dashboard to trigger AI recommendation again
+                      window.location.reload();
+                    } catch (err) {
+                      console.error(err);
+                      alert('Gagal memperbarui kondisi.');
+                    } finally {
+                      setSurveyLoading(false);
+                    }
+                  }} 
+                  className="btn-primary" style={{ flex: 1 }}
+                >
+                  {surveyLoading ? 'Menyimpan...' : 'Simpan & Update AI'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

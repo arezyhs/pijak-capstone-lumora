@@ -119,27 +119,23 @@ export function QuizView() {
               key={mod.id}
               onClick={() => startQuiz(mod)}
               style={{
-                background: 'rgba(255, 255, 255, 0.8)',
-                backdropFilter: 'blur(12px)',
+                background: 'var(--surface)',
                 border: '1px solid var(--border)',
-                borderRadius: '24px',
+                borderRadius: '6px',
                 padding: '32px',
                 cursor: 'pointer',
-                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                transition: 'background 0.2s',
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
                 gap: '16px',
-                boxShadow: '0 4px 20px rgba(0,0,0,0.02)',
               }}
               onMouseEnter={e => {
-                e.currentTarget.style.transform = 'translateY(-8px)'
-                e.currentTarget.style.boxShadow = `0 20px 40px ${mod.color}20`
+                e.currentTarget.style.background = 'var(--surface-alt)'
                 e.currentTarget.style.borderColor = mod.color
               }}
               onMouseLeave={e => {
-                e.currentTarget.style.transform = 'translateY(0)'
-                e.currentTarget.style.boxShadow = '0 4px 20px rgba(0,0,0,0.02)'
+                e.currentTarget.style.background = 'var(--surface)'
                 e.currentTarget.style.borderColor = 'var(--border)'
               }}
             >
@@ -281,7 +277,7 @@ export function QuizView() {
                   padding: '16px 20px',
                   borderRadius: '14px',
                   border: isSelected ? `2px solid ${selectedModule.color}` : '1px solid var(--border)',
-                  background: isSelected ? `${selectedModule.color}08` : '#ffffff',
+                  background: isSelected ? `${selectedModule.color}08` : 'var(--surface)',
                   color: 'var(--ink)',
                   cursor: 'pointer',
                   fontWeight: isSelected ? '700' : '500',

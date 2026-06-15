@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Float, DateTime, ForeignKey, Integer
+from sqlalchemy import Column, String, Float, DateTime, ForeignKey, Integer, Boolean
 from sqlalchemy.orm import relationship
 from datetime import datetime
 
@@ -13,6 +13,7 @@ class Student(Base):
     department = Column(String)
     sleep_hours = Column(Float, default=7.0)
     stress_level = Column(Integer, default=5)
+    has_completed_onboarding = Column(Boolean, default=False)
     
     age = Column(Integer, default=20)
     gender = Column(String, default="Female")
@@ -23,6 +24,7 @@ class Student(Base):
     
     quizzes = relationship("QuizProgress", back_populates="student", cascade="all, delete")
     materials = relationship("MaterialProgress", back_populates="student", cascade="all, delete")
+    condition_logs = relationship("DailyConditionLog", back_populates="student", cascade="all, delete")
 
 class QuizProgress(Base):
     __tablename__ = "quizzes"
@@ -44,3 +46,14 @@ class MaterialProgress(Base):
     completed_at = Column(DateTime, default=datetime.utcnow)
     
     student = relationship("Student", back_populates="materials")
+
+class DailyConditionLog(Base):
+    __tablename__ = "condition_logs"
+
+    id = Column(Integer, primary_key=True, index=True)
+    student_id = Column(Integer, ForeignKey("students.id"))
+    sleep_hours = Column(Float)
+    stress_level = Column(Integer)
+    logged_at = Column(DateTime, default=datetime.utcnow)
+    
+    student = relationship("Student", back_populates="condition_logs")

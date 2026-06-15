@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from datetime import datetime
 
 from app.core.database import get_db
-from app.models.student import Student, QuizProgress
+from app.models.student import Student, QuizProgress, MaterialProgress, DailyConditionLog
 from app.models.user import User as UserModel
 from app.api.auth import get_current_user, require_role, User, get_password_hash
 from app.schemas.learning import (
@@ -22,9 +22,9 @@ from app.schemas.learning import (
     MaterialCompletionRequest,
     QuizHistoryItem,
     StudentHistoryResponse,
+    ConditionHistoryItem,
 )
 from app.services.recommender import recommend_learning_path
-from app.models.student import Student, QuizProgress, MaterialProgress
 from app.data.materials import get_total_material_count
 
 router = APIRouter()
@@ -33,7 +33,9 @@ def seed_student_if_needed(db: Session, student_id: str):
     """Create a blank student profile if the user exists but has no profile yet."""
     student = db.query(Student).filter(Student.user_id == student_id).first()
     if not student:
-        student = Student(user_id=student_id, name=student_id, department="General")
+        user = db.query(UserModel).filter(UserModel.username == student_id).first()
+        actual_name = user.name if user and user.name else student_id
+        student = Student(user_id=student_id, name=actual_name, department="General")
         db.add(student)
         db.commit()
         db.refresh(student)
@@ -119,9 +121,31 @@ def update_student_profile(student_id: str, payload: UpdateProfileRequest, db: S
     student.family_income = payload.family_income
     student.parent_edu = payload.parent_edu
     student.extracurricular = payload.extracurricular
+    student.has_completed_onboarding = True
+    
+    # Log condition
+    log = DailyConditionLog(student_id=student.id, sleep_hours=payload.sleep_hours, stress_level=payload.stress_level)
+    db.add(log)
     
     db.commit()
     return {"message": "Profil berhasil diperbarui"}
+
+from pydantic import BaseModel
+class ConditionRequest(BaseModel):
+    sleep_hours: float
+    stress_level: int
+
+@router.patch("/students/{student_id}/condition")
+def update_student_condition(student_id: str, payload: ConditionRequest, db: Session = Depends(get_db), current_user: User = Depends(require_role("student"))):
+    student = seed_student_if_needed(db, student_id)
+    student.sleep_hours = payload.sleep_hours
+    student.stress_level = payload.stress_level
+    
+    log = DailyConditionLog(student_id=student.id, sleep_hours=payload.sleep_hours, stress_level=payload.stress_level)
+    db.add(log)
+    
+    db.commit()
+    return {"message": "Kondisi harian berhasil diperbarui"}
 
 
 @router.post("/students/{student_id}/submit_quiz", response_model=QuizResult)
@@ -257,6 +281,7 @@ def get_student_history(
             student_id=student_id,
             name=student.name,
             quiz_history=[],
+            condition_history=[],
             total_quizzes=0,
             average_score=0.0,
             highest_score=0.0,
@@ -275,20 +300,31 @@ def get_student_history(
         subject_scores.setdefault(q.subject, []).append(q.score)
     score_by_subject = {subj: round(sum(v) / len(v), 1) for subj, v in subject_scores.items()}
 
-    history_items = [
-        QuizHistoryItem(
-            id=q.id,
-            subject=q.subject,
-            score=q.score,
-            submitted_at=q.submitted_at.strftime("%d %b %Y, %H:%M")
-        )
-        for q in all_quizzes
-    ]
+    condition_logs = db.query(DailyConditionLog).filter(
+        DailyConditionLog.student_id == student.id
+    ).order_by(DailyConditionLog.logged_at.asc()).all()
 
     return StudentHistoryResponse(
         student_id=student_id,
         name=student.name,
-        quiz_history=history_items,
+        quiz_history=[
+            QuizHistoryItem(
+                id=q.id,
+                subject=q.subject,
+                score=q.score,
+                submitted_at=q.submitted_at.isoformat(),
+            )
+            for q in all_quizzes
+        ],
+        condition_history=[
+            ConditionHistoryItem(
+                id=c.id,
+                sleep_hours=c.sleep_hours,
+                stress_level=c.stress_level,
+                logged_at=c.logged_at.isoformat(),
+            )
+            for c in condition_logs
+        ],
         total_quizzes=len(all_quizzes),
         average_score=round(avg_score, 1),
         highest_score=highest,
@@ -356,7 +392,7 @@ def create_admin_student(payload: AdminStudentCreate, db: Session = Depends(get_
     if existing_user:
         raise HTTPException(status_code=409, detail="Username already exists")
 
-    user = UserModel(username=payload.user_id, hashed_password=get_password_hash(payload.password), role="student")
+    user = UserModel(username=payload.user_id, name=payload.name, hashed_password=get_password_hash(payload.password), role="student")
     student = Student(
         user_id=payload.user_id,
         name=payload.name,

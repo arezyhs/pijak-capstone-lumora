@@ -90,7 +90,7 @@ export function OnboardingView() {
               <label style={{ display: 'block', fontWeight: '500', marginBottom: '8px', color: 'var(--ink)', fontSize: '14px' }}>Umur</label>
               <input 
                 type="number" min="10" max="60" value={age} onChange={e => setAge(Number(e.target.value))}
-                style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--surface-alt)' }}
+                style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--surface-alt)', color: 'var(--ink)' }}
               />
             </div>
             
@@ -99,7 +99,7 @@ export function OnboardingView() {
               <label style={{ display: 'block', fontWeight: '500', marginBottom: '8px', color: 'var(--ink)', fontSize: '14px' }}>Jenis Kelamin</label>
               <select 
                 value={gender} onChange={e => setGender(e.target.value)}
-                style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--surface-alt)' }}>
+                style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--surface-alt)', color: 'var(--ink)' }}>
                 <option value="Female">Perempuan</option>
                 <option value="Male">Laki-laki</option>
               </select>
@@ -112,7 +112,7 @@ export function OnboardingView() {
               <label style={{ display: 'block', fontWeight: '500', marginBottom: '8px', color: 'var(--ink)', fontSize: '14px' }}>Pendapatan Keluarga</label>
               <select 
                 value={familyIncome} onChange={e => setFamilyIncome(e.target.value)}
-                style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--surface-alt)' }}>
+                style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--surface-alt)', color: 'var(--ink)' }}>
                 <option value="Low">Rendah</option>
                 <option value="Medium">Menengah</option>
                 <option value="High">Tinggi</option>
@@ -124,7 +124,7 @@ export function OnboardingView() {
               <label style={{ display: 'block', fontWeight: '500', marginBottom: '8px', color: 'var(--ink)', fontSize: '14px' }}>Pendidikan Orang Tua</label>
               <select 
                 value={parentEdu} onChange={e => setParentEdu(e.target.value)}
-                style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--surface-alt)' }}>
+                style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--surface-alt)', color: 'var(--ink)' }}>
                 <option value="None">Tidak Ada</option>
                 <option value="High School">SMA</option>
                 <option value="Bachelor's">Sarjana</option>
@@ -140,7 +140,7 @@ export function OnboardingView() {
               <label style={{ display: 'block', fontWeight: '500', marginBottom: '8px', color: 'var(--ink)', fontSize: '14px' }}>Akses Internet (Rumah)</label>
               <select 
                 value={internetAccess} onChange={e => setInternetAccess(e.target.value)}
-                style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--surface-alt)' }}>
+                style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--surface-alt)', color: 'var(--ink)' }}>
                 <option value="Yes">Ya</option>
                 <option value="No">Tidak</option>
               </select>
@@ -151,7 +151,7 @@ export function OnboardingView() {
               <label style={{ display: 'block', fontWeight: '500', marginBottom: '8px', color: 'var(--ink)', fontSize: '14px' }}>Ekstrakurikuler</label>
               <select 
                 value={extracurricular} onChange={e => setExtracurricular(e.target.value)}
-                style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--surface-alt)' }}>
+                style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--surface-alt)', color: 'var(--ink)' }}>
                 <option value="Yes">Ya</option>
                 <option value="No">Tidak</option>
               </select>

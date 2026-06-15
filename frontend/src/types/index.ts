@@ -100,10 +100,18 @@ export interface QuizHistoryItem {
   submitted_at: string;
 }
 
+export interface ConditionHistoryItem {
+  id: number;
+  sleep_hours: number;
+  stress_level: number;
+  logged_at: string;
+}
+
 export interface StudentHistoryResponse {
   student_id: string;
   name: string;
   quiz_history: QuizHistoryItem[];
+  condition_history: ConditionHistoryItem[];
   total_quizzes: number;
   average_score: number;
   highest_score: number;

@@ -29,6 +29,11 @@ export const loginApi = async (username: string, password: string) => {
   return response.data;
 };
 
+export const registerApi = async (payload: { username: string; name: string; password: string; role: string }) => {
+  const response = await axios.post('http://localhost:8000/api/v1/auth/register', payload);
+  return response.data;
+};
+
 export const fetchStudentDashboard = async (studentId: string): Promise<DashboardResponse> => {
   const response = await apiClient.get<DashboardResponse>(`/students/${studentId}/dashboard`);
   return response.data;
@@ -96,6 +101,14 @@ export const updateStudentProfile = async (
     { headers: { Authorization: `Bearer ${token}` } }
   )
   return response.data
+};
+
+export const updateStudentCondition = async (studentId: string, sleepHours: number, stressLevel: number) => {
+  const response = await apiClient.patch(`/students/${studentId}/condition`, {
+    sleep_hours: sleepHours,
+    stress_level: stressLevel
+  });
+  return response.data;
 };
 
 export const completeMaterial = async (studentId: string, materialId: string) => {

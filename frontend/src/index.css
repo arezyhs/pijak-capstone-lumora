@@ -1,32 +1,41 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
-
 :root {
-  /* Premium Dark Theme Variables */
-  --ink: #1e293b;
-  --ink-light: #475569;
-  --muted: #94a3b8;
-  --surface: #f8fafc;
-  --surface-alt: #f1f5f9;
-  --border: #e2e8f0;
+  /* Notion-style Variables */
+  --ink: #37352f;
+  --ink-light: rgba(55, 53, 47, 0.65);
+  --muted: rgba(55, 53, 47, 0.4);
+  --surface: #ffffff;
+  --surface-alt: #f7f7f5;
+  --border: rgba(55, 53, 47, 0.16);
   
-  /* Brand Accents */
-  --accent-primary: #6366f1; /* Indigo */
-  --accent-secondary: #8b5cf6; /* Violet */
-  --accent-gradient: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
-  --accent-glow: rgba(99, 102, 241, 0.2);
+  /* Brand Accents (Notion uses subtle blue for links/accents) */
+  --accent-primary: #2383e2; 
+  --accent-secondary: #2383e2;
+  --accent-gradient: none;
+  --accent-glow: transparent;
   
   /* Status Colors */
-  --success: #10b981;
-  --warning: #f59e0b;
-  --danger: #ef4444;
+  --success: #0f7b6c;
+  --warning: #d9730d;
+  --danger: #e03e3e;
 
-  font: 15px/1.6 'Outfit', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font: 15px/1.6 ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol";
   color: var(--ink-light);
   background: var(--surface);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+:root.dark {
+  --ink: rgba(255, 255, 255, 0.9);
+  --ink-light: rgba(255, 255, 255, 0.65);
+  --muted: rgba(255, 255, 255, 0.4);
+  --surface: #191919;
+  --surface-alt: #202020;
+  --border: rgba(255, 255, 255, 0.1);
+  --accent-primary: #5e9ddc;
+  --accent-secondary: #5e9ddc;
 }
 
 * {
@@ -42,11 +51,14 @@ body {
 
 button,
 a,
-input {
+input,
+select,
+textarea {
   font: inherit;
+  color: var(--ink);
 }
 
-/* Scrollbar customization */
+/* Scrollbar customization (Thin and minimal) */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -55,9 +67,9 @@ input {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--border);
+  background: rgba(55, 53, 47, 0.16);
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--muted);
+  background: rgba(55, 53, 47, 0.4);
 }

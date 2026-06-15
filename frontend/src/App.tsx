@@ -5,6 +5,7 @@ import { QuizView } from './pages/QuizView'
 import { MaterialView } from './pages/MaterialView'
 import { TeacherView } from './pages/TeacherView'
 import { LoginView } from './pages/LoginView'
+import { RegisterView } from './pages/RegisterView'
 import { ProfileView } from './pages/ProfileView'
 import { OnboardingView } from './pages/OnboardingView'
 import './App.css'
@@ -47,6 +48,7 @@ function App() {
   return (
     <Routes>
       <Route path="/login" element={<LoginView />} />
+      <Route path="/register" element={<RegisterView />} />
       
       {/* Rute Siswa */}
       <Route path="/onboarding" element={

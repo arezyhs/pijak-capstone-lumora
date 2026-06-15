@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Brain } from 'lucide-react';
 import { loginApi } from '../api/client';
 
@@ -20,6 +20,13 @@ export function LoginView() {
       localStorage.setItem('token', data.access_token);
       localStorage.setItem('role', data.role);
       localStorage.setItem('username', data.username);
+      localStorage.setItem('name', data.name);
+      localStorage.setItem('created_at', data.created_at);
+      if (data.has_completed_onboarding) {
+        localStorage.setItem('has_completed_onboarding', 'true');
+      } else {
+        localStorage.removeItem('has_completed_onboarding');
+      }
       
       // Arahkan sesuai role
       if (data.role === 'student') {
@@ -37,11 +44,8 @@ export function LoginView() {
 
   return (
     <div style={{ display: 'flex', height: '100vh', justifyContent: 'center', alignItems: 'center', background: 'var(--surface)', position: 'relative', overflow: 'hidden' }}>
-      {/* Background ambient mesh */}
-      <div style={{ position: 'absolute', top: '-20%', left: '-10%', width: '600px', height: '600px', background: 'radial-gradient(circle, var(--accent-glow) 0%, rgba(255,255,255,0) 70%)', borderRadius: '50%', zIndex: 0 }} />
-      <div style={{ position: 'absolute', bottom: '-20%', right: '-10%', width: '700px', height: '700px', background: 'radial-gradient(circle, rgba(139, 92, 246, 0.15) 0%, rgba(255,255,255,0) 70%)', borderRadius: '50%', zIndex: 0 }} />
-
-      <div style={{ position: 'relative', zIndex: 1, background: 'rgba(255, 255, 255, 0.7)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', padding: '3rem 4rem', borderRadius: '24px', boxShadow: '0 20px 40px rgba(0, 0, 0, 0.05)', border: '1px solid rgba(255,255,255,0.5)', width: '100%', maxWidth: '440px' }}>
+      {/* Background ambient mesh removed for flat design */}
+      <div style={{ position: 'relative', zIndex: 1, background: 'var(--surface)', padding: '3rem 4rem', borderRadius: '6px', border: '1px solid var(--border)', width: '100%', maxWidth: '440px' }}>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '2.5rem' }}>
           <div style={{ background: 'var(--accent-glow)', padding: '16px', borderRadius: '20px', marginBottom: '16px' }}>
             <Brain size={48} color="var(--accent-primary)" />
@@ -63,7 +67,7 @@ export function LoginView() {
               type="text" 
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              style={{ width: '100%', padding: '14px 16px', borderRadius: '12px', border: '1px solid var(--border)', background: 'white', outline: 'none', transition: 'border-color 0.2s', fontSize: '15px' }}
+              style={{ width: '100%', padding: '14px 16px', borderRadius: '12px', border: '1px solid var(--border)', background: 'var(--surface)', outline: 'none', transition: 'border-color 0.2s', fontSize: '15px' }}
               placeholder="Contoh: student1 atau teacher1"
               required
             />
@@ -74,7 +78,7 @@ export function LoginView() {
               type="password" 
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              style={{ width: '100%', padding: '14px 16px', borderRadius: '12px', border: '1px solid var(--border)', background: 'white', outline: 'none', transition: 'border-color 0.2s', fontSize: '15px' }}
+              style={{ width: '100%', padding: '14px 16px', borderRadius: '12px', border: '1px solid var(--border)', background: 'var(--surface)', outline: 'none', transition: 'border-color 0.2s', fontSize: '15px' }}
               placeholder="Masukkan sandi..."
               required
             />
@@ -88,14 +92,9 @@ export function LoginView() {
             {loading ? 'Memproses...' : 'Masuk Dashboard'}
           </button>
         </form>
-        
-        <div style={{ marginTop: '2.5rem', fontSize: '13px', color: 'var(--muted)', textAlign: 'center', padding: '16px', background: 'rgba(255,255,255,0.5)', borderRadius: '12px' }}>
-          <p style={{ marginBottom: '8px', color: 'var(--ink-light)' }}><strong>Akun Demo MVP:</strong></p>
-          <div style={{ display: 'flex', justifyContent: 'center', gap: '16px' }}>
-            <span><strong>Siswa:</strong> <code>student1</code></span>
-            <span><strong>Guru:</strong> <code>teacher1</code></span>
-          </div>
-          <p style={{ marginTop: '8px' }}>Sandi: <code>password123</code></p>
+        <div style={{ marginTop: '1.5rem', textAlign: 'center', fontSize: '14px' }}>
+          <span style={{ color: 'var(--muted)' }}>Belum punya akun? </span>
+          <Link to="/register" style={{ color: 'var(--accent-primary)', fontWeight: '600', textDecoration: 'none' }}>Daftar di sini</Link>
         </div>
       </div>
     </div>
