@@ -45,81 +45,119 @@ export function RegisterView() {
   };
 
   return (
-    <div style={{ display: 'flex', height: '100vh', justifyContent: 'center', alignItems: 'center', background: 'var(--surface)', position: 'relative', overflow: 'hidden' }}>
-      <div style={{ position: 'relative', zIndex: 1, background: 'var(--surface)', padding: '3rem 4rem', borderRadius: '6px', border: '1px solid var(--border)', width: '100%', maxWidth: '440px' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '2rem' }}>
-          <div style={{ background: 'var(--accent-glow)', padding: '16px', borderRadius: '20px', marginBottom: '16px' }}>
-            <Brain size={48} color="var(--accent-primary)" />
-          </div>
-          <h1 style={{ fontSize: '28px', fontWeight: '800', color: 'var(--ink)', letterSpacing: '-0.5px' }}>Daftar ke Lumora</h1>
-          <p style={{ color: 'var(--muted)', fontSize: '15px', marginTop: '4px' }}>Mulai belajar adaptif sekarang</p>
-        </div>
-
-        {error && (
-          <div style={{ background: '#fef2f2', color: '#ef4444', padding: '1rem', borderRadius: '12px', marginBottom: '1.5rem', fontSize: '14px', textAlign: 'center', border: '1px solid #fecaca' }}>
-            {error}
-          </div>
-        )}
-
-        <form onSubmit={handleRegister} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <div>
-            <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '600', color: 'var(--ink)' }}>Nama Lengkap</label>
-            <input 
-              type="text" 
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              style={{ width: '100%', padding: '12px 16px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--surface)', outline: 'none', transition: 'border-color 0.2s', fontSize: '15px' }}
-              placeholder="Contoh: Budi Santoso"
-              required
-            />
-          </div>
-          <div>
-            <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '600', color: 'var(--ink)' }}>Username</label>
-            <input 
-              type="text" 
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              style={{ width: '100%', padding: '12px 16px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--surface)', outline: 'none', transition: 'border-color 0.2s', fontSize: '15px' }}
-              placeholder="Unik dan tanpa spasi"
-              required
-            />
-          </div>
-          <div>
-            <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '600', color: 'var(--ink)' }}>Password</label>
-            <input 
-              type="password" 
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              style={{ width: '100%', padding: '12px 16px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--surface)', outline: 'none', transition: 'border-color 0.2s', fontSize: '15px' }}
-              placeholder="Minimal 6 karakter"
-              required
-            />
-          </div>
-          <div>
-            <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '600', color: 'var(--ink)' }}>Peran (Role)</label>
-            <select 
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
-              style={{ width: '100%', padding: '12px 16px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--surface)', outline: 'none', fontSize: '15px', color: 'var(--ink)' }}
-            >
-              <option value="student">Siswa (Student)</option>
-              <option value="teacher">Guru (Teacher)</option>
-            </select>
-          </div>
-          
-          <button 
-            type="submit" 
-            disabled={loading}
-            className="btn-primary"
-            style={{ marginTop: '8px', padding: '14px', fontSize: '16px' }}
-          >
-            {loading ? 'Memproses...' : 'Buat Akun'}
-          </button>
-        </form>
+    <div style={{ display: 'flex', height: '100vh', overflow: 'hidden', background: 'var(--surface)' }}>
+      {/* Kiri: Banner Info */}
+      <div style={{ 
+        flex: 2, 
+        background: 'linear-gradient(135deg, var(--accent-primary) 0%, #1e1b4b 100%)', 
+        display: 'flex', 
+        flexDirection: 'column', 
+        justifyContent: 'center', 
+        padding: '10%', 
+        color: 'white',
+        position: 'relative'
+      }}>
+        <div style={{ position: 'absolute', top: '-10%', right: '-10%', width: '400px', height: '400px', borderRadius: '50%', background: 'rgba(255,255,255,0.05)', filter: 'blur(40px)' }} />
         
-        <div style={{ marginTop: '1.5rem', textAlign: 'center', fontSize: '14px' }}>
-          <span style={{ color: 'var(--muted)' }}>Sudah punya akun? </span>
-          <Link to="/login" style={{ color: 'var(--accent-primary)', fontWeight: '600', textDecoration: 'none' }}>Masuk di sini</Link>
+        <Brain size={64} color="white" style={{ marginBottom: '32px', opacity: 0.9 }} />
+        <h1 style={{ fontSize: '56px', fontWeight: '800', marginBottom: '16px', lineHeight: 1.1, letterSpacing: '-1px' }}>
+          Mulai Belajar <br />Lebih Cerdas.
+        </h1>
+        <p style={{ fontSize: '20px', opacity: 0.85, maxWidth: '480px', lineHeight: 1.6, fontWeight: 300 }}>
+          Bergabunglah dengan Lumora. Kami akan menganalisis potensimu dan merancang kurikulum yang secara otomatis beradaptasi dengan kecepatan belajarmu.
+        </p>
+      </div>
+
+      {/* Kanan: Form Register */}
+      <div style={{ 
+        flex: 1, 
+        display: 'flex', 
+        flexDirection: 'column',
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        padding: '3rem',
+        minWidth: '450px',
+        background: 'var(--surface)',
+        borderLeft: '1px solid var(--border)'
+      }}>
+        <div style={{ width: '100%', maxWidth: '380px' }}>
+          <div style={{ marginBottom: '2.5rem' }}>
+            <h2 style={{ fontSize: '32px', fontWeight: '800', color: 'var(--ink)', letterSpacing: '-0.5px' }}>Daftar Akun</h2>
+            <p style={{ color: 'var(--muted)', fontSize: '15px', marginTop: '6px' }}>Buat akun baru secara gratis.</p>
+          </div>
+
+          {error && (
+            <div style={{ background: '#fef2f2', color: '#ef4444', padding: '1rem', borderRadius: '12px', marginBottom: '1.5rem', fontSize: '14px', border: '1px solid #fecaca' }}>
+              {error}
+            </div>
+          )}
+
+          <form onSubmit={handleRegister} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <div>
+              <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '600', color: 'var(--ink)' }}>Nama Lengkap</label>
+              <input 
+                type="text" 
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                style={{ width: '100%', padding: '12px 16px', borderRadius: '8px', border: '1px solid var(--border)', background: 'transparent', outline: 'none', transition: 'border-color 0.2s', fontSize: '15px' }}
+                placeholder="Contoh: Budi Santoso"
+                onFocus={e => e.target.style.borderColor = 'var(--accent-primary)'}
+                onBlur={e => e.target.style.borderColor = 'var(--border)'}
+                required
+              />
+            </div>
+            <div>
+              <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '600', color: 'var(--ink)' }}>Username</label>
+              <input 
+                type="text" 
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                style={{ width: '100%', padding: '12px 16px', borderRadius: '8px', border: '1px solid var(--border)', background: 'transparent', outline: 'none', transition: 'border-color 0.2s', fontSize: '15px' }}
+                placeholder="Unik dan tanpa spasi"
+                onFocus={e => e.target.style.borderColor = 'var(--accent-primary)'}
+                onBlur={e => e.target.style.borderColor = 'var(--border)'}
+                required
+              />
+            </div>
+            <div>
+              <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '600', color: 'var(--ink)' }}>Password</label>
+              <input 
+                type="password" 
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                style={{ width: '100%', padding: '12px 16px', borderRadius: '8px', border: '1px solid var(--border)', background: 'transparent', outline: 'none', transition: 'border-color 0.2s', fontSize: '15px' }}
+                placeholder="Minimal 6 karakter"
+                onFocus={e => e.target.style.borderColor = 'var(--accent-primary)'}
+                onBlur={e => e.target.style.borderColor = 'var(--border)'}
+                required
+              />
+            </div>
+            <div>
+              <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '600', color: 'var(--ink)' }}>Peran (Role)</label>
+              <select 
+                value={role}
+                onChange={(e) => setRole(e.target.value)}
+                style={{ width: '100%', padding: '12px 16px', borderRadius: '8px', border: '1px solid var(--border)', background: 'transparent', outline: 'none', fontSize: '15px', color: 'var(--ink)' }}
+              >
+                <option value="student">Siswa (Student)</option>
+                <option value="teacher">Guru (Teacher)</option>
+              </select>
+            </div>
+            
+            <button 
+              type="submit" 
+              disabled={loading}
+              className="btn-primary"
+              style={{ marginTop: '8px', padding: '14px', fontSize: '16px', fontWeight: '600', width: '100%' }}
+            >
+              {loading ? 'Memproses...' : 'Buat Akun'}
+            </button>
+          </form>
+          
+          <div style={{ marginTop: '2.5rem', textAlign: 'center', fontSize: '14px' }}>
+            <span style={{ color: 'var(--muted)' }}>Sudah punya akun? </span>
+            <Link to="/login" style={{ color: 'var(--accent-primary)', fontWeight: '600', textDecoration: 'none' }}>Masuk di sini</Link>
+          </div>
         </div>
       </div>
     </div>
