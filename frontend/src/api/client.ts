@@ -2,7 +2,7 @@ import axios from 'axios';
 import type { AdminStudentItem, AdminStudentPayload, DashboardResponse, TeacherOverview, QuizSubmission, QuizResult, StudentHistoryResponse } from '../types';
 
 const apiClient = axios.create({
-  baseURL: 'http://localhost:8000/api/v1',
+  baseURL: import.meta.env.VITE_API_URL || '/api/v1',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -21,7 +21,7 @@ export const loginApi = async (username: string, password: string) => {
   params.append('username', username);
   params.append('password', password);
   
-  const response = await axios.post('http://localhost:8000/api/v1/auth/login', params, {
+  const response = await axios.post(`${import.meta.env.VITE_API_URL || '/api/v1'}/auth/login`, params, {
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded'
     }
@@ -30,7 +30,7 @@ export const loginApi = async (username: string, password: string) => {
 };
 
 export const registerApi = async (payload: { username: string; name: string; password: string; role: string }) => {
-  const response = await axios.post('http://localhost:8000/api/v1/auth/register', payload);
+  const response = await axios.post(`${import.meta.env.VITE_API_URL || '/api/v1'}/auth/register`, payload);
   return response.data;
 };
 
@@ -87,7 +87,7 @@ export const updateStudentProfile = async (
 ) => {
   const token = localStorage.getItem('token')
   const response = await axios.post(
-    `http://localhost:8000/api/v1/students/${username}/profile`,
+    `${import.meta.env.VITE_API_URL || '/api/v1'}/students/${username}/profile`,
     { 
       sleep_hours: sleepHours, 
       stress_level: stressLevel,
