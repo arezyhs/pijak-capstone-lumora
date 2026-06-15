@@ -1,17 +1,20 @@
 # Lumora Backend API
 
-Backend Lumora bertugas menyediakan REST API untuk frontend dan mengintegrasikan model Machine Learning untuk fitur rekomendasi cerdas. 
-Dibuat dengan framework **FastAPI** yang sangat cepat dan didukung oleh tipe validasi menggunakan **Pydantic**.
+Backend Lumora menyediakan REST API untuk frontend dan mengintegrasikan model Machine Learning untuk fitur rekomendasi cerdas. Layanan ini dibangun menggunakan framework FastAPI untuk performa tinggi dan Pydantic untuk validasi tipe data.
 
-## Fitur API Utama
-- `/dashboard`: Endpoint komprehensif yang mengumpulkan data *progress* siswa, kuis terakhir, serta memanggil **AI Recommender** untuk mendapatkan kurikulum adaptif.
-- `/quiz/submit`: Menerima hasil jawaban kuis, menghitung skor, dan menghasilkan tingkat kesulitan (difficulty) baru berbasis AI.
-- Integrasi ke pipeline Machine Learning melalui `app/services/recommender.py`.
+## Fitur Utama
 
-## Integrasi ML Model
-Backend memuat model ML yang sudah dilatih (`ml/models/student_behavior_model.joblib`) secara otomatis saat startup. Saat endpoint AI dipanggil, backend akan memetakan *request payload* (skor, completion rate siswa) menjadi data turunan komprehensif, lalu mengirimkannya ke model *Random Forest* untuk mendapatkan prediksi (Remedial, Standard, Advanced) beserta persentase *confidence score* (Predict Proba).
+- `/dashboard`: Endpoint untuk mengumpulkan data perkembangan siswa, hasil kuis terakhir, dan memanggil layanan rekomendasi AI untuk menyusun kurikulum adaptif.
+- `/quiz/submit`: Endpoint untuk menerima jawaban kuis, menghitung skor akhir, dan menyesuaikan tingkat kesulitan soal berikutnya berdasarkan evaluasi AI.
+- Integrasi Machine Learning: Endpoint terhubung langsung dengan pipeline Machine Learning untuk melakukan inferensi secara otomatis.
 
-## Menjalankan Backend
+## Integrasi Model Machine Learning
+
+Backend memuat model Machine Learning yang telah dilatih (format joblib) secara otomatis pada saat sistem dimulai. Saat layanan rekomendasi dipanggil, backend akan memproses data permintaan (seperti skor dan tingkat penyelesaian materi) menjadi parameter yang sesuai, lalu mengirimkannya ke model Random Forest. Hasil yang dikembalikan berupa prediksi performa (Remedial, Standard, Advanced) beserta tingkat kepercayaan prediksi.
+
+## Cara Menjalankan Backend
+
+Jalankan perintah berikut untuk menginisiasi dan menjalankan server backend:
 
 ```bash
 python -m venv .venv
@@ -19,4 +22,5 @@ python -m venv .venv
 pip install -r requirements.txt
 uvicorn app.main:app --reload --port 8000
 ```
-Swagger UI untuk menguji API dan melihat skema interaktif tersedia di `http://localhost:8000/docs`.
+
+Anda dapat menguji API dan melihat skema interaktif melalui Swagger UI pada alamat: `http://localhost:8000/docs`

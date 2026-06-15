@@ -1,25 +1,28 @@
 # Lumora Frontend
 
-Aplikasi frontend untuk Lumora dibangun menggunakan **React** + **TypeScript** dan dikonfigurasi menggunakan **Vite**. 
+Antarmuka pengguna Lumora dibangun menggunakan React dengan TypeScript dan dikonfigurasi menggunakan Vite. Aplikasi ini dirancang dengan antarmuka yang modern dan responsif untuk memberikan pengalaman belajar yang nyaman dan intuitif.
 
-Lumora mengedepankan desain UI/UX yang modern, premium, dan intuitif menggunakan konsep *Glassmorphism*, palet warna *Indigo/Violet*, serta animasi mikro yang responsif untuk meningkatkan kenyamanan belajar siswa.
+## Struktur dan Komponen Utama
 
-## Struktur & Komponen Utama
-- `src/pages/Dashboard.tsx`: Pusat kontrol belajar siswa yang *actionable* (Prediksi AI, Peta Kurikulum interaktif, Topik Rekomendasi).
-- `src/pages/MaterialView.tsx`: Mode membaca *fullscreen* ala Notion dengan parser Markdown terintegrasi untuk artikel dan daftar materi yang elegan.
-- `src/pages/QuizView.tsx`: Mesin ujian interaktif dengan fitur navigasi soal dan kalkulasi skor otomatis.
-- `src/pages/TeacherView.tsx`: Dashboard monitoring analitik untuk guru melihat tingkat penyelesaian siswa.
+- Dashboard: Pusat kendali belajar siswa yang menampilkan prediksi AI, peta kurikulum interaktif, dan rekomendasi topik pembelajaran.
+- Material View: Halaman membaca materi dengan mode layar penuh dan parser Markdown terintegrasi untuk menampilkan teks pembelajaran secara terstruktur.
+- Quiz View: Halaman evaluasi interaktif yang dilengkapi fitur navigasi soal dan perhitungan skor secara otomatis.
+- Teacher View: Dashboard pemantauan analitik bagi pengajar untuk melihat tingkat partisipasi dan perkembangan penyelesaian tugas siswa.
 
-## Menjalankan Aplikasi
+## Cara Menjalankan Aplikasi
+
+Instal seluruh dependensi yang dibutuhkan lalu jalankan server pengembangan dengan perintah berikut:
 
 ```bash
 npm install
 npm run dev
 ```
 
-URL lokal default: `http://localhost:5173`.
+Aplikasi akan berjalan secara lokal dan dapat diakses melalui: `http://localhost:5173`
 
 ## Membangun untuk Produksi
+
+Untuk menghasilkan versi yang siap digunakan di lingkungan produksi, gunakan perintah:
 
 ```bash
 npm run build
