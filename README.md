@@ -48,6 +48,13 @@ Berbeda dengan aplikasi e-learning statis, Lumora mencatat rekam jejak psikologi
 
 ---
 
+## 📊 Sumber Dataset
+
+Sistem peringatan dini (klasifikasi risiko siswa) pada Lumora dilatih menggunakan dataset edukasi open-source dari Kaggle.
+- **Dataset Utama:** [Students Grading Dataset](https://www.kaggle.com/datasets/mahmoudelhemaly/students-grading-dataset) oleh Mahmoud Elhemaly.
+Dataset ini memuat variabel gabungan antara nilai akademis (kuis, tugas) dan variabel gaya hidup/psikologis (durasi tidur, tingkat stres, jam belajar), yang sangat cocok untuk menguji hipotesis dari fitur *Adaptive Learning* kami.
+
+---
 ## ⚙️ Arsitektur & Teknologi
 
 Aplikasi ini menggunakan pendekatan arsitektur terpisah (*decoupled architecture*):
