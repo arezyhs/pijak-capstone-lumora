@@ -117,6 +117,19 @@ Model AI di balik Lumora dilatih secara independen menggunakan *pipeline* klasif
 
 ---
 
+## 👥 Tim Pengembang (DevAcademy Capstone)
+
+Aplikasi ini merupakan mahakarya (*Capstone Project*) yang dipersembahkan oleh tim **AI Engineer** dari DevAcademy:
+
+| Nama | ID Peserta | Email | Peran (*Role*) |
+|---|---|---|---|
+| **Akbar Rezy Hanara Setiyawan** | APC284D6Y0339 | apc284d6y0339@student.devacademy.id | **Lead Full-Stack Developer & Cloud Architect**<br>*(Merancang arsitektur UI/UX Frontend, REST API Backend, Database PostgreSQL, hingga Pipeline Deployment ke Vercel/Render)* |
+| **Anggi Permana** | APC907D6Y0019 | apc907d6y0019@student.devacademy.id | **Machine Learning Engineer**<br>*(Analisis Dataset, EDA, Ekstraksi Fitur, dan Pelatihan Model Prediksi)* |
+| **Padre Willi Evans Simarmata** | APC318D6Y0260 | apc318d6y0260@student.devacademy.id | **Machine Learning Engineer**<br>*(Analisis Dataset, EDA, Ekstraksi Fitur, dan Pelatihan Model Prediksi)* |
+| **Ria Adelina** | APC528D6X0470 | apc528d6x0470@student.devacademy.id | **Machine Learning Engineer**<br>*(Analisis Dataset, EDA, Ekstraksi Fitur, dan Pelatihan Model Prediksi)* |
+
+---
+
 <div align="center">
   <b>Dibangun dengan ❤️ untuk masa depan pendidikan yang lebih cerdas dan personal.</b>
 </div>
