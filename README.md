@@ -15,7 +15,7 @@
 ## 🚀 Live Demo
 
 Aplikasi ini telah mengudara dan dapat diakses publik:
-- **Web App (Frontend)**: [pijak-capstone-lumora.vercel.app]
+- **Web App (Frontend)**: [https://pijak-capstone-lumora.vercel.app]
 
 *(Catatan: Karena menggunakan *tier* gratis di Render, panggilan API pertama kali mungkin memakan waktu 30-50 detik untuk membangunkan server dari mode tidur).*
 
