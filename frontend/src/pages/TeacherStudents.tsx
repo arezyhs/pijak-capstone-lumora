@@ -1,12 +1,11 @@
-import { useEffect, useMemo, useState } from 'react'
-import { AlertTriangle, Edit3, Plus, RefreshCw, Save, Trash2, X } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { AlertTriangle, Edit3, Plus, Save, Trash2, X } from 'lucide-react'
 import { LoadingScreen } from '../components/LoadingScreen'
 import './TeacherView.css'
 import {
   createAdminStudent,
   deleteAdminStudent,
   fetchTeacherOverview,
-  resetLearningData,
   updateAdminStudent,
 } from '../api/client'
 import type { AdminStudentItem, AdminStudentPayload, TeacherOverview } from '../types'
@@ -38,7 +37,7 @@ function riskColor(risk: AdminStudentItem['risk_level']) {
   return 'var(--success)'
 }
 
-export function TeacherView() {
+export function TeacherStudents() {
   const [teacher, setTeacher] = useState<TeacherOverview | null>(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -48,8 +47,6 @@ export function TeacherView() {
   const [editingId, setEditingId] = useState<number | null>(null)
 
   const students = teacher?.students ?? []
-  const highRisk = useMemo(() => students.filter(student => student.risk_level === 'high').length, [students])
-  const mediumRisk = useMemo(() => students.filter(student => student.risk_level === 'medium').length, [students])
 
   const loadData = async () => {
     try {
@@ -136,25 +133,6 @@ export function TeacherView() {
     }
   }
 
-  const handleResetLearning = async () => {
-    const confirmed = window.confirm('Reset semua data siswa, kuis, dan progress materi? Akun guru tetap ada.')
-    if (!confirmed) return
-    setSaving(true)
-    setError(null)
-    setMessage(null)
-    try {
-      await resetLearningData()
-      setMessage('Database belajar berhasil direset dari nol.')
-      resetForm()
-      await loadData()
-    } catch (err: any) {
-      console.error(err)
-      setError(err?.response?.data?.detail ?? 'Gagal mereset database belajar.')
-    } finally {
-      setSaving(false)
-    }
-  }
-
   if (loading) {
     return <LoadingScreen message="Menarik Data Kelas..." />
   }
@@ -163,37 +141,15 @@ export function TeacherView() {
     <div className="content">
       <header className="topbar" style={{ marginBottom: '12px' }}>
         <div>
-          <p className="eyebrow">Admin Pembelajaran</p>
-          <h1>Dashboard Guru</h1>
-        </div>
-        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-          <button className="btn-outline" onClick={loadData} disabled={saving} style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
-            <RefreshCw size={16} /> Sinkronkan
-          </button>
-          <button className="btn-outline danger-button" onClick={handleResetLearning} disabled={saving} style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
-            <Trash2 size={16} /> Reset Data Belajar
-          </button>
+          <p className="eyebrow">Manajemen Akun</p>
+          <h1>Data Siswa</h1>
         </div>
       </header>
 
       {error && <div className="admin-alert danger"><AlertTriangle size={16} /> {error}</div>}
       {message && <div className="admin-alert success">{message}</div>}
 
-      <section className="teacher-band">
-        <div>
-          <p className="eyebrow" style={{ color: '#c2410c' }}>Sinkron dengan Data Siswa</p>
-          <h2>
-            {highRisk} siswa risiko tinggi, {mediumRisk} siswa perlu dipantau.
-          </h2>
-        </div>
-        <div className="teacher-stats">
-          <span>{teacher?.total_students ?? 0} Total Siswa</span>
-          <span>{Math.round((teacher?.average_completion_rate ?? 0) * 100)}% Progress Kelas</span>
-          <span>{(teacher?.average_score ?? 0).toFixed(1)} Skor Rata-rata</span>
-        </div>
-      </section>
-
-      <div className="admin-grid">
+      <div className="admin-grid" style={{ gridTemplateColumns: '1fr' }}>
         <section className="panel">
           <div className="panel-heading">
             <h2>{editingId ? 'Edit Siswa' : 'Tambah Siswa'}</h2>
@@ -284,78 +240,55 @@ export function TeacherView() {
           </form>
         </section>
 
-        <section className="panel">
+        <section className="panel" style={{ marginTop: '24px' }}>
           <div className="panel-heading">
-            <h2>Siswa Prioritas</h2>
-            <span className="dash-model-badge">{teacher?.risk_topics.length ? teacher.risk_topics.join(', ') : 'Belum ada topik risiko'}</span>
+            <h2>CRUD Data Siswa</h2>
+            <span style={{ color: 'var(--muted)', fontSize: '13px' }}>Data ini dipakai langsung oleh dashboard siswa dan rekomendasi ML.</span>
           </div>
-          <div className="recommendation-list">
-            {students.filter(student => student.risk_level !== 'low').length === 0 ? (
-              <p style={{ color: 'var(--muted)', textAlign: 'center', padding: '18px' }}>Belum ada siswa berisiko. Data kelas masih bersih.</p>
-            ) : students.filter(student => student.risk_level !== 'low').map(student => (
-              <article key={student.id} className="admin-risk-row">
-                <div>
-                  <strong>{student.name}</strong>
-                  <span>Skor {student.average_score} · Progress {Math.round(student.completion_rate * 100)}% · Stres {student.stress_level}/10</span>
-                  <div className="dash-mini-tags">
-                    {student.weak_subjects.map(subject => <em key={subject}>#{subject}</em>)}
-                  </div>
-                </div>
-                <span className="admin-risk-badge" style={{ color: riskColor(student.risk_level) }}>{riskLabel(student.risk_level)}</span>
-              </article>
-            ))}
+          <div className="admin-table-wrap">
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th>Siswa</th>
+                  <th>Skor</th>
+                  <th>Progress</th>
+                  <th>Kuis</th>
+                  <th>Stres</th>
+                  <th>Risiko</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody>
+                {students.length === 0 ? (
+                  <tr>
+                    <td colSpan={7} style={{ textAlign: 'center', color: 'var(--muted)', padding: '24px' }}>
+                      Database siswa kosong. Tambahkan siswa baru atau biarkan siswa membuat profil saat login.
+                    </td>
+                  </tr>
+                ) : students.map(student => (
+                  <tr key={student.id}>
+                    <td>
+                      <strong>{student.name}</strong>
+                      <span>{student.user_id} · {student.department}</span>
+                    </td>
+                    <td>{student.average_score}</td>
+                    <td>{Math.round(student.completion_rate * 100)}%</td>
+                    <td>{student.total_quizzes}</td>
+                    <td>{student.stress_level}/10</td>
+                    <td><span className="admin-risk-badge" style={{ color: riskColor(student.risk_level) }}>{riskLabel(student.risk_level)}</span></td>
+                    <td>
+                      <div className="admin-actions">
+                        <button onClick={() => startEdit(student)} aria-label={`Edit ${student.name}`}><Edit3 size={15} /></button>
+                        <button onClick={() => handleDelete(student)} aria-label={`Hapus ${student.name}`}><Trash2 size={15} /></button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </section>
       </div>
-
-      <section className="panel" style={{ marginTop: '24px' }}>
-        <div className="panel-heading">
-          <h2>CRUD Data Siswa</h2>
-          <span style={{ color: 'var(--muted)', fontSize: '13px' }}>Data ini dipakai langsung oleh dashboard siswa dan rekomendasi ML.</span>
-        </div>
-        <div className="admin-table-wrap">
-          <table className="admin-table">
-            <thead>
-              <tr>
-                <th>Siswa</th>
-                <th>Skor</th>
-                <th>Progress</th>
-                <th>Kuis</th>
-                <th>Stres</th>
-                <th>Risiko</th>
-                <th>Aksi</th>
-              </tr>
-            </thead>
-            <tbody>
-              {students.length === 0 ? (
-                <tr>
-                  <td colSpan={7} style={{ textAlign: 'center', color: 'var(--muted)', padding: '24px' }}>
-                    Database siswa kosong. Tambahkan siswa baru atau biarkan siswa membuat profil saat login.
-                  </td>
-                </tr>
-              ) : students.map(student => (
-                <tr key={student.id}>
-                  <td>
-                    <strong>{student.name}</strong>
-                    <span>{student.user_id} · {student.department}</span>
-                  </td>
-                  <td>{student.average_score}</td>
-                  <td>{Math.round(student.completion_rate * 100)}%</td>
-                  <td>{student.total_quizzes}</td>
-                  <td>{student.stress_level}/10</td>
-                  <td><span className="admin-risk-badge" style={{ color: riskColor(student.risk_level) }}>{riskLabel(student.risk_level)}</span></td>
-                  <td>
-                    <div className="admin-actions">
-                      <button onClick={() => startEdit(student)} aria-label={`Edit ${student.name}`}><Edit3 size={15} /></button>
-                      <button onClick={() => handleDelete(student)} aria-label={`Hapus ${student.name}`}><Trash2 size={15} /></button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
     </div>
   )
 }

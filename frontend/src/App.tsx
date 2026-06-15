@@ -3,7 +3,9 @@ import { Sidebar } from './components/Sidebar'
 import { Dashboard } from './pages/Dashboard'
 import { QuizView } from './pages/QuizView'
 import { MaterialView } from './pages/MaterialView'
-import { TeacherView } from './pages/TeacherView'
+import { TeacherDashboard } from './pages/TeacherDashboard'
+import { TeacherStudents } from './pages/TeacherStudents'
+import { TeacherQuizzes } from './pages/TeacherQuizzes'
 import { LoginView } from './pages/LoginView'
 import { RegisterView } from './pages/RegisterView'
 import { ProfileView } from './pages/ProfileView'
@@ -75,7 +77,17 @@ function App() {
       {/* Rute Guru */}
       <Route path="/teacher" element={
         <ProtectedRoute allowedRoles={['teacher']}>
-          <MainLayout><TeacherView /></MainLayout>
+          <MainLayout><TeacherDashboard /></MainLayout>
+        </ProtectedRoute>
+      } />
+      <Route path="/teacher/students" element={
+        <ProtectedRoute allowedRoles={['teacher']}>
+          <MainLayout><TeacherStudents /></MainLayout>
+        </ProtectedRoute>
+      } />
+      <Route path="/teacher/quizzes" element={
+        <ProtectedRoute allowedRoles={['teacher']}>
+          <MainLayout><TeacherQuizzes /></MainLayout>
         </ProtectedRoute>
       } />
 

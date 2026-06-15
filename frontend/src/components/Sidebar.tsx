@@ -89,9 +89,17 @@ export function Sidebar() {
           )}
 
           {role === 'teacher' && (
-            <Link className={location.pathname === '/teacher' ? 'active' : ''} to="/teacher">
-              <Users size={16} /> Pantau Siswa
-            </Link>
+            <>
+              <Link className={location.pathname === '/teacher' ? 'active' : ''} to="/teacher">
+                <Activity size={16} /> Dasbor Utama
+              </Link>
+              <Link className={location.pathname === '/teacher/students' ? 'active' : ''} to="/teacher/students">
+                <Users size={16} /> Data Siswa
+              </Link>
+              <Link className={location.pathname === '/teacher/quizzes' ? 'active' : ''} to="/teacher/quizzes">
+                <BookOpen size={16} /> Bank Soal
+              </Link>
+            </>
           )}
         </nav>
       </div>

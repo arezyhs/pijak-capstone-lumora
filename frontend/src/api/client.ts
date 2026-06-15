@@ -131,6 +131,11 @@ export const fetchQuizzes = async () => {
   return response.data;
 };
 
+export const addQuizQuestion = async (categoryId: string, questionPayload: any) => {
+  const response = await apiClient.post(`/content/quizzes/${categoryId}/questions`, questionPayload);
+  return response.data;
+};
+
 export const fetchStudentHistory = async (studentId: string): Promise<StudentHistoryResponse> => {
   const response = await apiClient.get<StudentHistoryResponse>(`/students/${studentId}/history`);
   return response.data;
