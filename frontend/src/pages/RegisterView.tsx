@@ -77,29 +77,29 @@ export function RegisterView() {
         alignItems: 'center', 
         padding: '3rem',
         minWidth: '450px',
-        background: 'var(--surface)',
+        background: 'var(--bg)',
         borderLeft: '1px solid var(--border)'
       }}>
-        <div style={{ width: '100%', maxWidth: '380px' }}>
-          <div style={{ marginBottom: '2.5rem' }}>
-            <h2 style={{ fontSize: '32px', fontWeight: '800', color: 'var(--ink)', letterSpacing: '-0.5px' }}>Daftar Akun</h2>
-            <p style={{ color: 'var(--muted)', fontSize: '15px', marginTop: '6px' }}>Buat akun baru secara gratis.</p>
+        <div className="panel" style={{ width: '100%', maxWidth: '420px', padding: '2.5rem' }}>
+          <div style={{ marginBottom: '2rem', textAlign: 'center' }}>
+            <h2 style={{ fontSize: '28px', fontWeight: '700', color: 'var(--ink)', letterSpacing: '-0.5px' }}>Daftar Akun</h2>
+            <p style={{ color: 'var(--muted)', fontSize: '14px', marginTop: '4px' }}>Buat akun baru secara gratis.</p>
           </div>
 
           {error && (
-            <div style={{ background: '#fef2f2', color: '#ef4444', padding: '1rem', borderRadius: '12px', marginBottom: '1.5rem', fontSize: '14px', border: '1px solid #fecaca' }}>
+            <div style={{ padding: '12px', background: 'rgba(239, 68, 68, 0.1)', color: 'var(--danger)', borderRadius: '8px', marginBottom: '1.5rem', fontSize: '14px', textAlign: 'center' }}>
               {error}
             </div>
           )}
 
           <form onSubmit={handleRegister} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <div>
-              <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '600', color: 'var(--ink)' }}>Nama Lengkap</label>
+              <label style={{ display: 'block', fontWeight: '500', marginBottom: '8px', color: 'var(--ink)', fontSize: '14px' }}>Nama Lengkap</label>
               <input 
                 type="text" 
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                style={{ width: '100%', padding: '12px 16px', borderRadius: '8px', border: '1px solid var(--border)', background: 'transparent', outline: 'none', transition: 'border-color 0.2s', fontSize: '15px' }}
+                style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--surface-alt)', color: 'var(--ink)', outline: 'none', transition: 'border-color 0.2s', fontSize: '15px' }}
                 placeholder="Contoh: Budi Santoso"
                 onFocus={e => e.target.style.borderColor = 'var(--accent-primary)'}
                 onBlur={e => e.target.style.borderColor = 'var(--border)'}
@@ -107,12 +107,12 @@ export function RegisterView() {
               />
             </div>
             <div>
-              <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '600', color: 'var(--ink)' }}>Username</label>
+              <label style={{ display: 'block', fontWeight: '500', marginBottom: '8px', color: 'var(--ink)', fontSize: '14px' }}>Username</label>
               <input 
                 type="text" 
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                style={{ width: '100%', padding: '12px 16px', borderRadius: '8px', border: '1px solid var(--border)', background: 'transparent', outline: 'none', transition: 'border-color 0.2s', fontSize: '15px' }}
+                style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--surface-alt)', color: 'var(--ink)', outline: 'none', transition: 'border-color 0.2s', fontSize: '15px' }}
                 placeholder="Unik dan tanpa spasi"
                 onFocus={e => e.target.style.borderColor = 'var(--accent-primary)'}
                 onBlur={e => e.target.style.borderColor = 'var(--border)'}
@@ -120,12 +120,12 @@ export function RegisterView() {
               />
             </div>
             <div>
-              <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '600', color: 'var(--ink)' }}>Password</label>
+              <label style={{ display: 'block', fontWeight: '500', marginBottom: '8px', color: 'var(--ink)', fontSize: '14px' }}>Password</label>
               <input 
                 type="password" 
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                style={{ width: '100%', padding: '12px 16px', borderRadius: '8px', border: '1px solid var(--border)', background: 'transparent', outline: 'none', transition: 'border-color 0.2s', fontSize: '15px' }}
+                style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--surface-alt)', color: 'var(--ink)', outline: 'none', transition: 'border-color 0.2s', fontSize: '15px' }}
                 placeholder="Minimal 6 karakter"
                 onFocus={e => e.target.style.borderColor = 'var(--accent-primary)'}
                 onBlur={e => e.target.style.borderColor = 'var(--border)'}
@@ -133,11 +133,11 @@ export function RegisterView() {
               />
             </div>
             <div>
-              <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '600', color: 'var(--ink)' }}>Peran (Role)</label>
+              <label style={{ display: 'block', fontWeight: '500', marginBottom: '8px', color: 'var(--ink)', fontSize: '14px' }}>Peran (Role)</label>
               <select 
                 value={role}
                 onChange={(e) => setRole(e.target.value)}
-                style={{ width: '100%', padding: '12px 16px', borderRadius: '8px', border: '1px solid var(--border)', background: 'transparent', outline: 'none', fontSize: '15px', color: 'var(--ink)' }}
+                style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--surface-alt)', outline: 'none', fontSize: '15px', color: 'var(--ink)' }}
               >
                 <option value="student">Siswa (Student)</option>
                 <option value="teacher">Guru (Teacher)</option>
@@ -148,13 +148,13 @@ export function RegisterView() {
               type="submit" 
               disabled={loading}
               className="btn-primary"
-              style={{ marginTop: '8px', padding: '14px', fontSize: '16px', fontWeight: '600', width: '100%' }}
+              style={{ marginTop: '8px', padding: '12px', fontSize: '15px', fontWeight: '600', width: '100%' }}
             >
               {loading ? 'Memproses...' : 'Buat Akun'}
             </button>
           </form>
           
-          <div style={{ marginTop: '2.5rem', textAlign: 'center', fontSize: '14px' }}>
+          <div style={{ marginTop: '2rem', textAlign: 'center', fontSize: '14px' }}>
             <span style={{ color: 'var(--muted)' }}>Sudah punya akun? </span>
             <Link to="/login" style={{ color: 'var(--accent-primary)', fontWeight: '600', textDecoration: 'none' }}>Masuk di sini</Link>
           </div>

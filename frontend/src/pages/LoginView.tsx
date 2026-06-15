@@ -76,30 +76,30 @@ export function LoginView() {
         alignItems: 'center', 
         padding: '3rem',
         minWidth: '450px',
-        background: 'var(--surface)',
+        background: 'var(--bg)',
         borderLeft: '1px solid var(--border)'
       }}>
-        <div style={{ width: '100%', maxWidth: '380px' }}>
-          <div style={{ marginBottom: '2.5rem' }}>
-            <h2 style={{ fontSize: '32px', fontWeight: '800', color: 'var(--ink)', letterSpacing: '-0.5px' }}>Selamat Datang</h2>
-            <p style={{ color: 'var(--muted)', fontSize: '15px', marginTop: '6px' }}>Silakan masuk ke akun Lumora Anda.</p>
+        <div className="panel" style={{ width: '100%', maxWidth: '420px', padding: '2.5rem' }}>
+          <div style={{ marginBottom: '2rem', textAlign: 'center' }}>
+            <h2 style={{ fontSize: '28px', fontWeight: '700', color: 'var(--ink)', letterSpacing: '-0.5px' }}>Selamat Datang</h2>
+            <p style={{ color: 'var(--muted)', fontSize: '14px', marginTop: '4px' }}>Silakan masuk ke akun Lumora Anda.</p>
           </div>
 
           {error && (
-            <div style={{ background: '#fef2f2', color: '#ef4444', padding: '1rem', borderRadius: '12px', marginBottom: '1.5rem', fontSize: '14px', border: '1px solid #fecaca' }}>
+            <div style={{ padding: '12px', background: 'rgba(239, 68, 68, 0.1)', color: 'var(--danger)', borderRadius: '8px', marginBottom: '1.5rem', fontSize: '14px', textAlign: 'center' }}>
               {error}
             </div>
           )}
 
-          <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <div>
-              <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '600', color: 'var(--ink)' }}>Username / Nama Pengguna</label>
+              <label style={{ display: 'block', fontWeight: '500', marginBottom: '8px', color: 'var(--ink)', fontSize: '14px' }}>Username / Nama Pengguna</label>
               <input 
                 type="text" 
                 value={username}
                 onChange={e => setUsername(e.target.value)}
                 placeholder="Ketik username kamu..."
-                style={{ width: '100%', padding: '14px', borderRadius: '12px', border: '1px solid var(--border)', background: 'transparent', outline: 'none', fontSize: '15px', color: 'var(--ink)', transition: 'border-color 0.2s' }}
+                style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--surface-alt)', color: 'var(--ink)', outline: 'none', transition: 'border-color 0.2s' }}
                 onFocus={e => e.target.style.borderColor = 'var(--accent-primary)'}
                 onBlur={e => e.target.style.borderColor = 'var(--border)'}
                 required
@@ -107,13 +107,13 @@ export function LoginView() {
             </div>
 
             <div>
-              <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '600', color: 'var(--ink)' }}>Kata Sandi</label>
+              <label style={{ display: 'block', fontWeight: '500', marginBottom: '8px', color: 'var(--ink)', fontSize: '14px' }}>Kata Sandi</label>
               <input 
                 type="password" 
                 value={password}
                 onChange={e => setPassword(e.target.value)}
                 placeholder="Masukkin sandi..."
-                style={{ width: '100%', padding: '14px', borderRadius: '12px', border: '1px solid var(--border)', background: 'transparent', outline: 'none', fontSize: '15px', color: 'var(--ink)', transition: 'border-color 0.2s' }}
+                style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--surface-alt)', color: 'var(--ink)', outline: 'none', transition: 'border-color 0.2s' }}
                 onFocus={e => e.target.style.borderColor = 'var(--accent-primary)'}
                 onBlur={e => e.target.style.borderColor = 'var(--border)'}
                 required
@@ -124,13 +124,13 @@ export function LoginView() {
               type="submit" 
               disabled={loading}
               className="btn-primary"
-              style={{ marginTop: '8px', width: '100%', padding: '14px', fontSize: '16px', fontWeight: '600' }}
+              style={{ marginTop: '8px', width: '100%', padding: '12px', fontSize: '15px', fontWeight: '600' }}
             >
               {loading ? 'Lagi Masuk...' : 'Masuk Dashboard'}
             </button>
           </form>
 
-          <p style={{ marginTop: '2.5rem', textAlign: 'center', fontSize: '14px', color: 'var(--muted)' }}>
+          <p style={{ marginTop: '2rem', textAlign: 'center', fontSize: '14px', color: 'var(--muted)' }}>
             Belum punya akun? <Link to="/register" style={{ color: 'var(--accent-primary)', textDecoration: 'none', fontWeight: '600' }}>Daftar sekarang</Link>
           </p>
         </div>
