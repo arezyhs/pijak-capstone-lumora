@@ -117,9 +117,9 @@ Model AI di balik Lumora dilatih secara independen menggunakan *pipeline* klasif
 
 ---
 
-## 👥 Tim Pengembang (DevAcademy Capstone)
+## 👥 Tim Pengembang PJK-RM116
 
-Aplikasi ini merupakan mahakarya (*Capstone Project*) yang dipersembahkan oleh tim **AI Engineer** dari DevAcademy:
+Aplikasi ini merupakan mahakarya (*Capstone Project*) yang dipersembahkan oleh tim **AI Engineer** PJK-RM116:
 
 | Nama | ID Peserta | Email | Peran (*Role*) |
 |---|---|---|---|
