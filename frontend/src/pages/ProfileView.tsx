@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { User, Award, BookOpen, Clock, Settings, Activity, Moon, BarChart2, TrendingUp, TrendingDown, Hash } from 'lucide-react'
-import { fetchStudentHistory } from '../api/client'
-import type { StudentHistoryResponse } from '../types'
+import { fetchStudentHistory, fetchTeacherOverview } from '../api/client'
+import type { StudentHistoryResponse, TeacherOverview } from '../types'
 
 export function ProfileView() {
   const role = localStorage.getItem('role') || 'student'
@@ -12,6 +12,7 @@ export function ProfileView() {
   const isTeacher = role === 'teacher'
 
   const [history, setHistory] = useState<StudentHistoryResponse | null>(null)
+  const [teacherOverview, setTeacherOverview] = useState<TeacherOverview | null>(null)
   const [historyLoading, setHistoryLoading] = useState(true)
 
   useEffect(() => {
@@ -21,7 +22,10 @@ export function ProfileView() {
         .catch(console.error)
         .finally(() => setHistoryLoading(false))
     } else {
-      setHistoryLoading(false)
+      fetchTeacherOverview()
+        .then(setTeacherOverview)
+        .catch(console.error)
+        .finally(() => setHistoryLoading(false))
     }
   }, [username, isTeacher])
 
@@ -81,9 +85,9 @@ export function ProfileView() {
           <div className="metric-grid">
             {isTeacher ? (
               <>
-                <article><User size={24} color="#3b82f6" /><span>Total Siswa Didik</span><strong>142 Siswa</strong></article>
-                <article><BookOpen size={24} color="#8b5cf6" /><span>Mata Pelajaran</span><strong>3 Mapel</strong></article>
-                <article><Activity size={24} color="#10b981" /><span>Rata-rata Kelas</span><strong>82.5</strong></article>
+                <article><User size={24} color="#3b82f6" /><span>Total Siswa Didik</span><strong>{teacherOverview?.total_students ?? '0'} Siswa</strong></article>
+                <article><BookOpen size={24} color="#8b5cf6" /><span>Mata Pelajaran</span><strong>{teacherOverview ? '3' : '—'} Mapel</strong></article>
+                <article><Activity size={24} color="#10b981" /><span>Rata-rata Kelas</span><strong>{teacherOverview?.average_score?.toFixed(1) ?? '—'}</strong></article>
               </>
             ) : (
               <>

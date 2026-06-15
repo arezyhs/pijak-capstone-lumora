@@ -62,7 +62,7 @@ def seed_data():
             db.commit()
 
         # Check if students already exist
-        if db.query(Student).count() == 0:
+        if db.query(Student).count() < 20:
             print("Seeding students to database from dataset...")
             json_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../ml/data/Students Performance Dataset.json'))
             if os.path.exists(json_path):
