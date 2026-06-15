@@ -4,15 +4,15 @@
 
 ![React](https://img.shields.io/badge/react-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB)
 ![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi)
-![SQLite](https://img.shields.io/badge/sqlite-%2307405e.svg?style=for-the-badge&logo=sqlite&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/postgresql-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white)
 ![scikit-learn](https://img.shields.io/badge/scikit--learn-%23F7931E.svg?style=for-the-badge&logo=scikit-learn&logoColor=white)
 ![Vite](https://img.shields.io/badge/vite-%23646CFF.svg?style=for-the-badge&logo=vite&logoColor=white)
 
 </div>
 
-Lumora adalah aplikasi web pembelajaran yang memadukan modul materi biasa dengan pemodelan *Machine Learning*. Aplikasi ini dibuat sebagai proyek akhir (*Capstone Project*) dari program **Pijak in collaboration with IBM SkillsBuild** yang diselenggarakan oleh **Dicoding**.
+Lumora adalah aplikasi web pembelajaran adaptif yang memadukan modul materi edukasi dengan pemodelan *Machine Learning*. Aplikasi ini dibuat sebagai mahakarya akhir (*Capstone Project*) dari program **Pijak in collaboration with IBM SkillsBuild** yang diselenggarakan oleh **Dicoding**.
 
-Berbeda dengan aplikasi e-learning biasa, Lumora mencatat kondisi harian siswa (seperti jam tidur dan tingkat stres) beserta skor kuis mereka, lalu menggunakan model prediksi untuk menentukan tingkat kesulitan materi selanjutnya secara otomatis.
+Berbeda dengan aplikasi e-learning statis, Lumora mencatat rekam jejak psikologis harian siswa (seperti jam tidur dan tingkat stres) beserta riwayat nilai mereka, lalu menggunakan model prediksi (Random Forest) untuk menyusun rekomendasi belajar secara otomatis.
 
 ---
 
@@ -30,38 +30,61 @@ Berbeda dengan aplikasi e-learning biasa, Lumora mencatat kondisi harian siswa (
 ## 🚀 Live Demo
 
 - **Aplikasi Web**: [Kunjungi Lumora di Vercel](https://pijak-capstone-lumora.vercel.app)
-*(Catatan: Karena Backend API menggunakan server gratis di Render, proses masuk/login pertama kali mungkin memakan waktu 30-50 detik untuk membangunkan server).*
+*(Catatan: Karena Backend API di Render.com akan 'tidur' jika tidak ada aktivitas, proses masuk/login pertama kali mungkin memakan waktu hingga 50 detik untuk menyalakan ulang server).*
 
 ---
 
 ## ✨ Fitur Aplikasi
 
-### 1. Mode Siswa
-- **Rekomendasi Materi Otomatis**: Menyusun daftar bacaan dan latihan secara dinamis berdasarkan perhitungan skor kuis terakhir dan profil siswa.
-- **Check-in Harian**: Formulir singkat untuk melaporkan durasi tidur dan beban pikiran sebelum memulai sesi belajar.
-- **Modul Baca & Kuis**: Antarmuka pembaca materi yang bersih (Notion-style) yang diakhiri dengan evaluasi interaktif.
+### 🧑‍🎓 Modul Siswa (Student Experience)
+- **Rekomendasi Materi Otomatis**: Menyusun daftar bacaan dan prioritas latihan secara dinamis berdasarkan perhitungan dari skor kuis terakhir dan metrik psikologis siswa.
+- **Check-in Psikologis**: Formulir laporan durasi tidur dan beban pikiran (*stress level*) sebelum memulai sesi belajar.
+- **Evaluasi Interaktif**: Antarmuka pengerjaan kuis dengan navigasi cepat, pengunci jawaban otomatis, dan kalkulasi skor seketika.
 
-### 2. Mode Guru
-- **Tabel Monitoring Kelas**: Ringkasan lengkap performa seluruh siswa dalam satu layar.
-- **Indikator Risiko Siswa**: Menyorot siswa yang diprediksi oleh AI berada pada kategori "Risiko Tinggi" (rentan nilai turun atau stres tinggi), sehingga guru dapat melakukan intervensi manual.
-- **Manajemen Akun**: Fitur penambahan dan pengubahan profil siswa di kelas.
+### 👨‍🏫 Modul Guru (Teacher Dashboard & CMS)
+- **Dasbor Analitik Modular**: Ringkasan performa seluruh siswa, tingkat rata-rata kelas, dan total partisipasi dalam satu layar yang mudah dibaca.
+- **Indikator Risiko Dini (Early Warning System)**: Model *Machine Learning* mendeteksi dan menyorot siswa yang diklasifikasikan ke dalam "Risiko Tinggi", sehingga guru dapat segera melakukan intervensi manual.
+- **Content Management System (CMS)**: Fitur bagi guru untuk menambahkan soal baru ke dalam bank soal (*database*) secara dinamis langsung dari antarmuka web.
+
+---
+
+## ⚙️ Arsitektur & Teknologi
+
+Aplikasi ini menggunakan pendekatan arsitektur terpisah (*decoupled architecture*):
+
+1. **Frontend (Di-deploy ke Vercel)** 
+   - Dibuat menggunakan **React 18** (TypeScript) dan *bundler* **Vite**.
+   - Pendekatan desain UI menggunakan **Vanilla CSS Modular** tanpa *framework* eksternal untuk unjuk performa pemuatan super ringan dan fleksibilitas gaya piksel (*pixel-perfect*).
+
+2. **Backend & Machine Learning (Di-deploy ke Render)**
+   - Berbasis **FastAPI** (Python) untuk menyajikan REST API berkinerja tinggi.
+   - Pustaka **scikit-learn** dimuat secara *real-time* ke dalam memori aplikasi menggunakan artefak `joblib` untuk memproses inferensi (prediksi) secara langsung.
+   - Menggunakan basis data terpusat **PostgreSQL (Neon)** di ranah produksi, yang disinkronkan menggunakan ORM **SQLAlchemy**. Terdapat fitur *Automated Database Seeding* yang menyuntikkan data saat pertama kali server diluncurkan.
+
+---
+
+## 📖 Dokumentasi Teknis Lanjutan
+
+Untuk mempelajari lebih lanjut tentang arsitektur setiap modul, silakan baca dokumentasi rinci di direktori berikut:
+
+- [Frontend Documentation (`/frontend/README.md`)](./frontend/README.md)
+- [Backend Documentation (`/backend/README.md`)](./backend/README.md)
+- [Machine Learning & EDA (`/ml/README.md`)](./ml/README.md)
 
 ---
 
 ## 💻 Menjalankan Aplikasi Secara Lokal
 
 ### 1. Menyiapkan Backend
-Buka terminal dan jalankan perintah berikut:
 ```bash
 cd backend
 python -m venv .venv
 
 # Aktivasi Lingkungan Virtual (Windows)
 .venv\Scripts\activate
-# Aktivasi Lingkungan Virtual (Mac/Linux)
-source .venv/bin/activate
+# Aktivasi (Mac/Linux)
+# source .venv/bin/activate
 
-# Install pustaka dan jalankan server
 pip install -r requirements.txt
 python -m uvicorn app.main:app --reload
 ```
@@ -78,43 +101,9 @@ npm run dev
 
 ---
 
-## ⚙️ Arsitektur & Teknologi
-
-Aplikasi ini dipisah menjadi dua sistem utama (*split deployment*):
-
-1. **Frontend (Vercel)** 
-   - Dibuat menggunakan **React 18** (TypeScript) dan di-*build* melalui **Vite**.
-   - Desain murni menggunakan Vanilla CSS secara modular untuk menjaga tampilan yang bersih, responsif, dan ringan.
-
-2. **Backend & Machine Learning (Render)**
-   - Berbasis **FastAPI** (Python) untuk melayani koneksi API berkecepatan tinggi.
-   - Pustaka **scikit-learn** digunakan untuk memproses klasifikasi data dari file model `student_behavior_model.joblib`.
-   - Menggunakan basis data **SQLite** (lokal) / PostgreSQL yang dikelola melalui ORM **SQLAlchemy**.
-
----
-
-## 📂 Struktur Direktori
-
-```text
-pijak-capstone-lumora/
-├── backend/                  # Server API & Logika AI
-│   ├── app/                  # Rute FastAPI, Model DB, dan Autentikasi
-│   └── requirements.txt      # Dependensi Python
-├── frontend/                 # Aplikasi Web React
-│   ├── src/                  # Komponen UI, Halaman, dan Klien API
-│   ├── vercel.json           # Aturan Routing Vercel
-│   └── package.json          # Dependensi Node.js
-└── ml/                       # Eksplorasi Machine Learning
-    ├── data/                 # Dataset mentah dan yang sudah diproses
-    ├── models/               # File model terlatih (.joblib)
-    └── notebooks/            # Jupyter Notebook untuk training model
-```
-
----
-
 ## 👥 Tim Pengembang (PJK-RM116)
 
-Aplikasi ini adalah hasil *Capstone Project* dari tim MSIB AI Engineer:
+Aplikasi ini adalah hasil kerja keras *Capstone Project* dari tim PJK-RM116:
 
 | Nama | ID Peserta | Email | Peran Utama |
 |---|---|---|---|
