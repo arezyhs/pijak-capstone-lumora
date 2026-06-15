@@ -11,7 +11,7 @@ node_modules/
 dist/
 build/
 
-*.joblib
+# *.joblib (diizinkan agar model ML bisa naik ke Render)
 *.pkl
 *.sqlite3
 *.db
