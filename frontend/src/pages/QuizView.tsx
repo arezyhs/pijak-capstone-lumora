@@ -1,6 +1,7 @@
 import { useState, useEffect, type ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { submitQuiz, fetchQuizzes } from '../api/client'
+import { LoadingScreen } from '../components/LoadingScreen'
 import { BookOpen, Calculator, BrainCircuit, Activity, CheckCircle2, XCircle, ArrowLeft, Languages, Landmark, Map, Cpu } from 'lucide-react'
 
 // --- Data Types ---
@@ -96,11 +97,7 @@ export function QuizView() {
 
   // --- Module Selection Screen ---
   if (loading) {
-    return (
-      <div className="content" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '50vh' }}>
-        <p style={{ color: 'var(--muted)' }}>Memuat bank soal dari server...</p>
-      </div>
-    )
+    return <LoadingScreen message="Memuat bank soal dari server..." />
   }
 
   if (!selectedModule) {

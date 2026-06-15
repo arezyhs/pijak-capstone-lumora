@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts'
+import { LoadingScreen } from '../components/LoadingScreen'
 import { fetchMaterials, fetchQuizzes, fetchStudentDashboard, fetchStudentHistory } from '../api/client'
+import './Dashboard.css'
 import {
   Activity,
   AlertTriangle,
@@ -214,12 +216,7 @@ export function Dashboard() {
   }, [dashboard, quizzes, weakSubjects])
 
   if (loading) {
-    return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '80vh', flexDirection: 'column', gap: '1rem' }}>
-        <Brain size={48} color="var(--accent-primary)" style={{ animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite' }} />
-        <h2 style={{ color: 'var(--ink)' }}>Menyelaraskan AI Engine...</h2>
-      </div>
-    )
+    return <LoadingScreen message="Menyelaraskan AI Engine..." />
   }
 
   if (error || !dashboard) {

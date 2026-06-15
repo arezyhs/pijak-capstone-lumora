@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
-import { AlertTriangle, Brain, Edit3, Plus, RefreshCw, Save, Trash2, X } from 'lucide-react'
+import { AlertTriangle, Edit3, Plus, RefreshCw, Save, Trash2, X } from 'lucide-react'
+import { LoadingScreen } from '../components/LoadingScreen'
+import './TeacherView.css'
 import {
   createAdminStudent,
   deleteAdminStudent,
@@ -154,12 +156,7 @@ export function TeacherView() {
   }
 
   if (loading) {
-    return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '80vh', flexDirection: 'column', gap: '1rem' }}>
-        <Brain size={48} color="var(--accent-primary)" style={{ animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite' }} />
-        <h2 style={{ color: 'var(--ink)' }}>Menarik Data Kelas...</h2>
-      </div>
-    )
+    return <LoadingScreen message="Menarik Data Kelas..." />
   }
 
   return (

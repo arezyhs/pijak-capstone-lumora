@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useTheme } from './ThemeProvider'
 import { updateStudentCondition } from '../api/client'
+import './Layout.css'
 
 export function Sidebar() {
   const location = useLocation()

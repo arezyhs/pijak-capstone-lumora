@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import { PlayCircle, FileText, CheckCircle2, ArrowLeft, BookOpen, Clock, ChevronRight, Tags } from 'lucide-react'
+import { LoadingScreen } from '../components/LoadingScreen'
 import { completeMaterial, fetchMaterials, fetchCompletedMaterials } from '../api/client'
+import './MaterialView.css'
 
 // --- Data Types ---
 type MaterialItem = {
@@ -203,11 +205,7 @@ export function MaterialView() {
   // CATEGORY SELECTION
   // ============================================================
   if (loading) {
-    return (
-      <div className="content" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '50vh' }}>
-        <p style={{ color: 'var(--muted)' }}>Memuat materi dari server...</p>
-      </div>
-    )
+    return <LoadingScreen message="Memuat materi dari server..." />
   }
 
   if (!activeCategory) {

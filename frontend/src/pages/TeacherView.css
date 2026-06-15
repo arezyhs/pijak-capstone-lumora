@@ -1,0 +1,221 @@
+.teacher-band {
+  padding: 24px;
+  border-radius: 6px;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.teacher-band h2 {
+  font-size: 20px;
+  color: var(--ink);
+  font-weight: 600;
+  max-width: 500px;
+}
+
+.teacher-stats {
+  display: flex;
+  gap: 12px;
+}
+
+.teacher-stats span {
+  padding: 8px 12px;
+  border-radius: 4px;
+  background: var(--surface);
+  color: var(--ink);
+  font-weight: 600;
+  font-size: 14px;
+  border: 1px solid var(--border);
+}
+
+.admin-alert {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 14px;
+  border: 1px solid transparent;
+}
+
+.admin-alert.danger {
+  background: rgba(224, 62, 62, 0.1);
+  border-color: rgba(224, 62, 62, 0.2);
+  color: var(--danger);
+}
+
+.admin-alert.success {
+  background: rgba(15, 123, 108, 0.1);
+  border-color: rgba(15, 123, 108, 0.2);
+  color: var(--success);
+}
+
+.admin-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  gap: 16px;
+}
+
+.admin-form {
+  display: grid;
+  gap: 12px;
+}
+
+.admin-form label {
+  display: grid;
+  gap: 6px;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.admin-form label span {
+  color: var(--muted);
+  font-weight: 400;
+}
+
+.admin-form input,
+.admin-form select {
+  width: 100%;
+  min-height: 36px;
+  padding: 8px 12px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 14px;
+  outline: none;
+}
+
+.admin-form input:focus,
+.admin-form select:focus {
+  border-color: rgba(35, 131, 226, 0.5);
+  box-shadow: 0 0 0 2px rgba(35, 131, 226, 0.2);
+}
+
+.admin-form-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.admin-form-row:last-of-type {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.admin-form button {
+  justify-self: start;
+}
+
+.admin-table-wrap {
+  overflow-x: auto;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.admin-table {
+  width: 100%;
+  min-width: 760px;
+  border-collapse: collapse;
+}
+
+.admin-table thead {
+  background: var(--surface-alt);
+}
+
+.admin-table th,
+.admin-table td {
+  padding: 12px 16px;
+  text-align: left;
+  vertical-align: middle;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+}
+
+.admin-table th {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.admin-table tbody tr:hover {
+  background: rgba(55, 53, 47, 0.04);
+}
+
+.admin-table td:first-child strong {
+  display: block;
+  color: var(--ink);
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.admin-table td:first-child span {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.admin-risk-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 6px;
+  border-radius: 3px;
+  background: var(--surface-alt);
+  color: var(--ink) !important;
+  font-size: 12px;
+  font-weight: 500;
+  border: 1px solid var(--border);
+}
+
+.admin-risk-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.admin-risk-row:last-child {
+  border-bottom: none;
+}
+
+.admin-risk-row strong {
+  display: block;
+  color: var(--ink);
+  margin-bottom: 2px;
+}
+
+.admin-risk-row span {
+  display: block;
+  color: var(--ink-light);
+  font-size: 13px;
+}
+
+.admin-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.admin-actions button {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--ink-light);
+  cursor: pointer;
+}
+
+.admin-actions button:hover {
+  background: var(--surface-alt);
+  color: var(--ink);
+}
+
+/* Dashboard Actionable Paths */
