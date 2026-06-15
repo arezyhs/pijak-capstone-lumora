@@ -6,13 +6,9 @@ interface LoadingScreenProps {
 
 export function LoadingScreen({ message = "Memuat data..." }: LoadingScreenProps) {
   return (
-    <div style={{ 
-      display: 'flex', 
+    <div className="content" style={{ 
       justifyContent: 'center', 
       alignItems: 'center', 
-      minHeight: '60vh', 
-      flexDirection: 'column', 
-      gap: '20px' 
     }}>
       <div style={{
         background: 'var(--surface-alt)',
