@@ -1,60 +1,66 @@
-# API Contract
+# API Contract Lumora
 
-Base URL lokal: `http://localhost:8000`
+Base URL lokal: `http://localhost:8000/api/v1`
 
-## Health
+## Autentikasi
 
-`GET /health`
+### `POST /auth/register`
+Mendaftarkan pengguna baru (Siswa atau Guru).
+- **Request Body**: `{"username": "string", "password": "password", "name": "string", "role": "student|teacher"}`
+- **Response**: `{"access_token": "jwt", "token_type": "bearer", "role": "student", "username": "...", "name": "...", "created_at": "...", "has_completed_onboarding": false}`
 
-```json
-{
-  "status": "ok",
-  "service": "lumora-api"
-}
-```
+### `POST /auth/login`
+Masuk dengan kredensial.
+- **Request Body**: (Form Data) `username=...&password=...`
+- **Response**: Sama seperti Register.
 
-## Dashboard Siswa
+## Profil & Kondisi Siswa
 
-`GET /api/v1/students/{student_id}/dashboard`
+### `PUT /students/{student_id}/profile`
+Memperbarui profil statis siswa (Onboarding).
+- **Request Body**: `{"department": "IPA", "age": 16, "gender": "L", "internet_access": 1, "family_income": 2, "parent_edu": 3, "extracurricular": 1}`
+- **Response**: `{"status": "success", ...}`
 
-Mengembalikan progress, rekomendasi materi, hasil quiz terakhir, dan learning path.
+### `POST /students/{student_id}/condition`
+Mencatat log kondisi harian siswa (Check-in).
+- **Request Body**: `{"sleep_hours": 6, "stress_level": 7}`
+- **Response**: `{"status": "success", ...}`
 
-## Rekomendasi Materi
+## Dashboard & Pembelajaran Siswa
 
-`POST /api/v1/recommendations`
+### `GET /students/{student_id}/dashboard`
+Mengembalikan rangkuman performa siswa.
+- **Response**: `{"summary": {...}, "recent_history": [...], "learning_path": {...}}`
 
-Request:
+### `POST /students/{student_id}/complete_material`
+Menandai materi sebagai selesai.
+- **Request Body**: `{"material_id": "string", "score": 100}`
 
-```json
-{
-  "student_id": "student-001",
-  "subject": "Matematika",
-  "quiz_score": 68,
-  "completion_rate": 0.72,
-  "weak_topics": ["Pecahan", "Persamaan Linear"]
-}
-```
+### `POST /students/{student_id}/submit_quiz`
+Mengumpulkan nilai kuis.
+- **Request Body**: `{"subject": "Matematika", "topic": "Aljabar", "score": 85, "answers": [...]}`
 
-Response:
+### `GET /students/{student_id}/history`
+Mengambil riwayat pembelajaran, kuis, dan kondisi.
 
-```json
-{
-  "student_id": "student-001",
-  "difficulty": "remedial",
-  "recommended_topics": ["Pecahan", "Persamaan Linear"],
-  "materials": [
-    {
-      "title": "Latihan Pecahan Bertahap",
-      "type": "practice",
-      "priority": 1
-    }
-  ],
-  "reason": "Skor quiz menunjukkan penguatan konsep dasar masih diperlukan."
-}
-```
+## Rekomendasi ML
 
-## Monitoring Guru
+### `POST /recommendations`
+Meminta rekomendasi AI.
+- **Request Body**: `{"student_id": "string", "subject": "string", "quiz_score": 80, ...}`
+- **Response**: `{"student_id": "...", "difficulty": "...", "recommended_topics": [...], "materials": [...], "reason": "..."}`
 
-`GET /api/v1/teacher/overview`
+## Monitoring Guru / Admin
 
-Mengembalikan agregasi jumlah siswa, rata-rata progress, topik berisiko, dan siswa yang perlu perhatian.
+### `GET /teacher/overview`
+Mengambil statistik kelas (hanya role teacher).
+- **Response**: `{"total_students": 30, "average_progress": 0.8, "at_risk_count": 5, "students": [...]}`
+
+### `POST /teacher/students`
+Menambah siswa secara manual dari dasbor guru.
+
+### `PUT /teacher/students/{student_id}`
+Mengubah data profil/kondisi siswa dari dasbor guru.
+
+### `DELETE /teacher/students/{student_id}`
+Menghapus profil siswa.
