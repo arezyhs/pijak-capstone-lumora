@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { PlayCircle, FileText, CheckCircle2, ArrowLeft, BookOpen, Clock, ChevronRight } from 'lucide-react'
+import { PlayCircle, FileText, CheckCircle2, ArrowLeft, BookOpen, Clock, ChevronRight, Tags } from 'lucide-react'
 import { completeMaterial, fetchMaterials } from '../api/client'
 
 // --- Data Types ---
@@ -9,6 +9,7 @@ type MaterialItem = {
   type: 'video' | 'article'
   duration: string
   completed: boolean
+  tags?: string[]
   content?: string
 }
 
@@ -16,6 +17,7 @@ type SubjectCategory = {
   id: string
   name: string
   color: string
+  tags?: string[]
   materials: MaterialItem[]
 }
 
@@ -161,6 +163,12 @@ export function MaterialView() {
             </span>
           </div>
 
+          {activeMaterial.tags && activeMaterial.tags.length > 0 && (
+            <div className="content-tags" aria-label="Tag materi">
+              {activeMaterial.tags.slice(0, 6).map(tag => <span key={tag}>#{tag}</span>)}
+            </div>
+          )}
+
           <hr className="reader-divider" />
 
           {/* Content */}
@@ -231,6 +239,11 @@ export function MaterialView() {
                 <p style={{ color: 'var(--muted)', fontSize: '14px', lineHeight: '1.5' }}>
                   {cat.materials.length} materi · artikel & video
                 </p>
+                {cat.tags && cat.tags.length > 0 && (
+                  <div className="content-tags compact" aria-label={`Tag ${cat.name}`}>
+                    {cat.tags.slice(0, 4).map(tag => <span key={tag}>#{tag}</span>)}
+                  </div>
+                )}
                 <div className="mat-progress-track">
                   <div className="mat-progress-fill" style={{ width: `${pct}%`, background: cat.color }} />
                 </div>
@@ -275,6 +288,9 @@ export function MaterialView() {
                   {mat.type === 'video' ? 'Video' : 'Artikel'}
                 </span>
                 <span><Clock size={13} /> {mat.duration}</span>
+                {mat.tags?.slice(0, 3).map(tag => (
+                  <span key={tag}><Tags size={13} /> #{tag}</span>
+                ))}
               </div>
             </div>
             <ChevronRight size={20} className="mat-list-arrow" />

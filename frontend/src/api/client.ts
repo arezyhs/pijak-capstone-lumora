@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { DashboardResponse, TeacherOverview, QuizSubmission, QuizResult, StudentHistoryResponse } from '../types';
+import type { AdminStudentItem, AdminStudentPayload, DashboardResponse, TeacherOverview, QuizSubmission, QuizResult, StudentHistoryResponse } from '../types';
 
 const apiClient = axios.create({
   baseURL: 'http://localhost:8000/api/v1',
@@ -36,6 +36,31 @@ export const fetchStudentDashboard = async (studentId: string): Promise<Dashboar
 
 export const fetchTeacherOverview = async (): Promise<TeacherOverview> => {
   const response = await apiClient.get<TeacherOverview>('/teacher/overview');
+  return response.data;
+};
+
+export const fetchAdminStudents = async (): Promise<AdminStudentItem[]> => {
+  const response = await apiClient.get<AdminStudentItem[]>('/admin/students');
+  return response.data;
+};
+
+export const createAdminStudent = async (payload: AdminStudentPayload): Promise<AdminStudentItem> => {
+  const response = await apiClient.post<AdminStudentItem>('/admin/students', payload);
+  return response.data;
+};
+
+export const updateAdminStudent = async (studentId: number, payload: Partial<AdminStudentPayload>): Promise<AdminStudentItem> => {
+  const response = await apiClient.put<AdminStudentItem>(`/admin/students/${studentId}`, payload);
+  return response.data;
+};
+
+export const deleteAdminStudent = async (studentId: number) => {
+  const response = await apiClient.delete(`/admin/students/${studentId}`);
+  return response.data;
+};
+
+export const resetLearningData = async () => {
+  const response = await apiClient.delete('/admin/reset-learning');
   return response.data;
 };
 

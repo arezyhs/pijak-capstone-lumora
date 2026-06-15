@@ -25,4 +25,13 @@ def test_create_recommendation() -> None:
     )
 
     assert response.status_code == 200
-    assert response.json()["difficulty"] == "remedial"
+    data = response.json()
+    assert data["difficulty"] in {
+        "Fundamental Level",
+        "Intermediate Level",
+        "Advanced Level",
+        "Fast-Track Program",
+        "Visual Learning Path",
+        "Microlearning Mode",
+    }
+    assert "pecahan" in data["recommended_tags"]

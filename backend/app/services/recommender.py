@@ -2,6 +2,8 @@ import os
 import joblib
 import numpy as np
 import pandas as pd
+from app.data.materials import get_tags_for_subject
+from app.data.quizzes import get_tags_for_quiz
 from app.schemas.learning import Material, RecommendationRequest, RecommendationResponse
 
 # Construct path to ML model
@@ -35,11 +37,15 @@ def recommend_learning_path(payload: RecommendationRequest) -> RecommendationRes
             # Map app subjects to dataset department names
             topic_map = {
                 "Matematika": "Mathematics",
-                "Sains": "Science",
-                "Logika": "Computer Science",
-                "Bahasa Inggris": "English",
+                "Sains": "Engineering",
+                "Logika": "CS",
+                "Bahasa Indonesia": "Business",
+                "Bahasa Inggris": "Business",
+                "Sejarah": "Business",
+                "Geografi": "Engineering",
+                "Informatika": "CS",
             }
-            department = topic_map.get(payload.subject, "Computer Science")
+            department = topic_map.get(payload.subject, "CS")
 
             # Map real app data to model features
             # - Quizzes_Avg: directly from the quiz score
@@ -142,14 +148,26 @@ def recommend_learning_path(payload: RecommendationRequest) -> RecommendationRes
             material_type = "challenge"
             format_suffix = "(Level Lanjut)"
 
-    topics = payload.weak_topics or [payload.subject]
+    subject_tags = get_tags_for_subject(payload.subject)
+    quiz_tags = get_tags_for_quiz(payload.subject)
+    weak_topic_tags = [
+        topic.lower().replace("_", "-").replace(" ", "-")
+        for topic in payload.weak_topics
+    ]
+    recommended_tags = list(dict.fromkeys([*weak_topic_tags, *subject_tags, *quiz_tags]))
+    topics = payload.weak_topics or recommended_tags[:3] or [payload.subject]
     materials = []
 
     for index, t in enumerate(topics[:3]):
+        material_tags = list(dict.fromkeys([
+            t.lower().replace("_", "-").replace(" ", "-"),
+            *recommended_tags[:5],
+        ]))
         materials.append(Material(
             title=f"{t} {format_suffix}",
             type=material_type,
             priority=index + 1,
+            tags=material_tags,
         ))
 
     # Sisipkan materi selingan jika terdeteksi burnout
@@ -157,13 +175,17 @@ def recommend_learning_path(payload: RecommendationRequest) -> RecommendationRes
         materials.insert(0, Material(
             title="Selingan: Trik Belajar Sambil Rebahan",
             type="wellness",
-            priority=0
+            priority=0,
+            tags=["wellness", "microlearning", "stress-management"],
         ))
 
     return RecommendationResponse(
         student_id=payload.student_id,
         difficulty=difficulty_label,
+        model_used=model_used,
+        confidence=round(confidence, 4),
         recommended_topics=topics[:3],
+        recommended_tags=recommended_tags[:8],
         materials=materials,
         reason=reason,
     )

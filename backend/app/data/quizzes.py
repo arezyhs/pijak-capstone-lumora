@@ -4,103 +4,159 @@ QUIZZES_DATA = [
         "title": "Matematika Dasar",
         "icon": "Calculator",
         "color": "#3b82f6",
+        "tags": ["matematika", "numerasi", "aljabar", "geometri", "statistika"],
         "questions": [
-            {
-                "question": "Berapakah hasil dari 15 × 12?",
-                "options": ["160", "170", "180", "190"],
-                "correctIndex": 2
-            },
-            {
-                "question": "Jika x + 7 = 15, berapakah nilai x?",
-                "options": ["6", "7", "8", "9"],
-                "correctIndex": 2
-            },
-            {
-                "question": "Berapakah luas persegi panjang dengan panjang 8 cm dan lebar 5 cm?",
-                "options": ["30 cm²", "35 cm²", "40 cm²", "45 cm²"],
-                "correctIndex": 2
-            },
-            {
-                "question": "Berapakah hasil dari √144?",
-                "options": ["10", "11", "12", "14"],
-                "correctIndex": 2
-            },
-            {
-                "question": "Jika 2x - 3 = 11, berapakah nilai x?",
-                "options": ["5", "6", "7", "8"],
-                "correctIndex": 2
-            }
-        ]
+            {"question": "Berapakah hasil dari 15 x 12?", "options": ["160", "170", "180", "190"], "correctIndex": 2, "tags": ["matematika", "aritmetika"]},
+            {"question": "Jika x + 7 = 15, berapakah nilai x?", "options": ["6", "7", "8", "9"], "correctIndex": 2, "tags": ["matematika", "aljabar", "persamaan-linear"]},
+            {"question": "Luas persegi panjang dengan panjang 8 cm dan lebar 5 cm adalah?", "options": ["30 cm2", "35 cm2", "40 cm2", "45 cm2"], "correctIndex": 2, "tags": ["matematika", "geometri", "luas"]},
+            {"question": "Berapakah hasil dari akar 144?", "options": ["10", "11", "12", "14"], "correctIndex": 2, "tags": ["matematika", "akar", "numerasi"]},
+            {"question": "Jika 2x - 3 = 11, berapakah nilai x?", "options": ["5", "6", "7", "8"], "correctIndex": 2, "tags": ["matematika", "aljabar", "persamaan-linear"]},
+            {"question": "Bentuk persen dari 3/4 adalah?", "options": ["25%", "50%", "75%", "80%"], "correctIndex": 2, "tags": ["matematika", "pecahan", "persen"]},
+            {"question": "Median dari data 4, 8, 6, 10, 12 adalah?", "options": ["6", "8", "10", "12"], "correctIndex": 1, "tags": ["matematika", "statistika", "median"]},
+            {"question": "Rasio 6 : 9 dalam bentuk paling sederhana adalah?", "options": ["1 : 2", "2 : 3", "3 : 4", "6 : 3"], "correctIndex": 1, "tags": ["matematika", "rasio", "perbandingan"]},
+            {"question": "Peluang muncul angka genap pada dadu enam sisi adalah?", "options": ["1/6", "1/3", "1/2", "2/3"], "correctIndex": 2, "tags": ["matematika", "peluang"]},
+            {"question": "Keliling persegi dengan sisi 9 cm adalah?", "options": ["18 cm", "27 cm", "36 cm", "81 cm"], "correctIndex": 2, "tags": ["matematika", "geometri", "keliling"]},
+        ],
     },
     {
         "id": "Sains",
         "title": "Sains Terpadu",
         "icon": "Activity",
         "color": "#10b981",
+        "tags": ["sains", "biologi", "fisika", "kimia", "lingkungan"],
         "questions": [
-            {
-                "question": "Planet manakah yang paling dekat dengan matahari?",
-                "options": ["Venus", "Mars", "Merkurius", "Bumi"],
-                "correctIndex": 2
-            },
-            {
-                "question": "Apa rumus kimia dari air?",
-                "options": ["CO₂", "H₂O", "NaCl", "O₂"],
-                "correctIndex": 1
-            },
-            {
-                "question": "Satuan SI untuk gaya adalah?",
-                "options": ["Joule", "Watt", "Newton", "Pascal"],
-                "correctIndex": 2
-            },
-            {
-                "question": "Proses tumbuhan mengubah cahaya matahari menjadi energi disebut?",
-                "options": ["Respirasi", "Fotosintesis", "Fermentasi", "Osmosis"],
-                "correctIndex": 1
-            },
-            {
-                "question": "Lapisan atmosfer bumi yang paling dekat dengan permukaan disebut?",
-                "options": ["Stratosfer", "Mesosfer", "Troposfer", "Termosfer"],
-                "correctIndex": 2
-            }
-        ]
+            {"question": "Planet yang paling dekat dengan Matahari adalah?", "options": ["Venus", "Mars", "Merkurius", "Bumi"], "correctIndex": 2, "tags": ["sains", "astronomi", "tata-surya"]},
+            {"question": "Rumus kimia air adalah?", "options": ["CO2", "H2O", "NaCl", "O2"], "correctIndex": 1, "tags": ["sains", "kimia"]},
+            {"question": "Satuan SI untuk gaya adalah?", "options": ["Joule", "Watt", "Newton", "Pascal"], "correctIndex": 2, "tags": ["sains", "fisika", "gaya"]},
+            {"question": "Proses tumbuhan mengubah cahaya menjadi glukosa disebut?", "options": ["Respirasi", "Fotosintesis", "Fermentasi", "Osmosis"], "correctIndex": 1, "tags": ["sains", "biologi", "fotosintesis"]},
+            {"question": "Lapisan atmosfer yang paling dekat dengan permukaan Bumi adalah?", "options": ["Stratosfer", "Mesosfer", "Troposfer", "Termosfer"], "correctIndex": 2, "tags": ["sains", "atmosfer"]},
+            {"question": "Bagian atom yang bermuatan negatif adalah?", "options": ["Proton", "Neutron", "Elektron", "Nukleon"], "correctIndex": 2, "tags": ["sains", "kimia", "atom"]},
+            {"question": "Tempat pertukaran gas pada paru-paru adalah?", "options": ["Bronkus", "Trakea", "Alveolus", "Laring"], "correctIndex": 2, "tags": ["sains", "biologi", "pernapasan"]},
+            {"question": "Hukum I Newton berkaitan dengan konsep?", "options": ["Inersia", "Energi panas", "Tekanan air", "Arus listrik"], "correctIndex": 0, "tags": ["sains", "fisika", "newton"]},
+            {"question": "Gas rumah kaca yang sering dikaitkan dengan perubahan iklim adalah?", "options": ["CO2", "Helium", "Neon", "Argon"], "correctIndex": 0, "tags": ["sains", "lingkungan", "iklim"]},
+            {"question": "Ikatan kovalen terbentuk karena atom?", "options": ["Berbagi elektron", "Berbagi proton", "Kehilangan neutron", "Memecah inti"], "correctIndex": 0, "tags": ["sains", "kimia", "ikatan-kimia"]},
+        ],
     },
     {
         "id": "Logika",
-        "title": "Logika & Penalaran",
+        "title": "Logika dan Penalaran",
         "icon": "BrainCircuit",
         "color": "#8b5cf6",
+        "tags": ["logika", "penalaran", "pola", "argumen", "problem-solving"],
         "questions": [
-            {
-                "question": "Jika semua kucing adalah hewan, dan Mimi adalah kucing, maka:",
-                "options": ["Mimi bukan hewan", "Mimi adalah hewan", "Semua hewan adalah kucing", "Mimi adalah anjing"],
-                "correctIndex": 1
-            },
-            {
-                "question": "Apa bilangan berikutnya dalam deret: 2, 6, 18, 54, ...?",
-                "options": ["108", "162", "72", "148"],
-                "correctIndex": 1
-            },
-            {
-                "question": "Negasi dari pernyataan \"Semua siswa lulus ujian\" adalah:",
-                "options": ["Semua siswa tidak lulus", "Ada siswa yang tidak lulus", "Tidak ada siswa yang lulus", "Beberapa siswa lulus"],
-                "correctIndex": 1
-            },
-            {
-                "question": "Jika p → q benar dan p benar, maka:",
-                "options": ["q salah", "q benar", "Tidak dapat ditentukan", "p salah"],
-                "correctIndex": 1
-            },
-            {
-                "question": "Manakah yang merupakan contoh silogisme yang valid?",
-                "options": [
-                    "Semua A adalah B, semua B adalah C, maka semua A adalah C",
-                    "Beberapa A adalah B, semua C adalah B, maka semua A adalah C",
-                    "Semua A adalah B, beberapa C adalah A, maka semua C adalah B",
-                    "Tidak ada yang valid"
-                ],
-                "correctIndex": 0
-            }
-        ]
-    }
+            {"question": "Jika semua kucing adalah hewan, dan Mimi adalah kucing, maka:", "options": ["Mimi bukan hewan", "Mimi adalah hewan", "Semua hewan adalah kucing", "Mimi adalah anjing"], "correctIndex": 1, "tags": ["logika", "silogisme"]},
+            {"question": "Bilangan berikutnya dari deret 2, 6, 18, 54 adalah?", "options": ["108", "162", "72", "148"], "correctIndex": 1, "tags": ["logika", "pola", "deret"]},
+            {"question": "Negasi dari 'Semua siswa lulus ujian' adalah?", "options": ["Semua siswa tidak lulus", "Ada siswa yang tidak lulus", "Tidak ada siswa yang lulus", "Beberapa siswa lulus"], "correctIndex": 1, "tags": ["logika", "negasi", "proposisi"]},
+            {"question": "Jika p -> q benar dan p benar, maka q?", "options": ["Salah", "Benar", "Tidak dapat ditentukan", "Tidak relevan"], "correctIndex": 1, "tags": ["logika", "implikasi"]},
+            {"question": "Contoh silogisme valid adalah?", "options": ["Semua A adalah B, semua B adalah C, maka semua A adalah C", "Beberapa A adalah B, semua C adalah B, maka semua A adalah C", "Semua A adalah B, beberapa C adalah A, maka semua C adalah B", "Tidak ada yang valid"], "correctIndex": 0, "tags": ["logika", "silogisme"]},
+            {"question": "Deret 1, 1, 2, 3, 5, 8 disebut deret?", "options": ["Aritmatika", "Geometri", "Fibonacci", "Kuadrat"], "correctIndex": 2, "tags": ["logika", "pola", "fibonacci"]},
+            {"question": "Bias ketika seseorang hanya mencari bukti yang mendukung pendapatnya disebut?", "options": ["Confirmation bias", "Random bias", "Sampling error", "Noise"], "correctIndex": 0, "tags": ["logika", "bias-kognitif"]},
+            {"question": "Penalaran dari aturan umum ke kasus khusus disebut?", "options": ["Induktif", "Deduktif", "Analogis", "Spekulatif"], "correctIndex": 1, "tags": ["logika", "deduktif"]},
+            {"question": "Alat visual untuk menunjukkan hubungan antar himpunan adalah?", "options": ["Diagram Venn", "Diagram batang", "Peta kontur", "Histogram"], "correctIndex": 0, "tags": ["logika", "diagram-venn"]},
+            {"question": "Langkah pertama problem solving yang baik adalah?", "options": ["Menebak jawaban", "Memahami masalah", "Menyalin soal", "Menghapus data"], "correctIndex": 1, "tags": ["logika", "problem-solving"]},
+        ],
+    },
+    {
+        "id": "Bahasa Inggris",
+        "title": "Bahasa Inggris",
+        "icon": "Languages",
+        "color": "#f97316",
+        "tags": ["bahasa-inggris", "grammar", "reading", "vocabulary", "writing"],
+        "questions": [
+            {"question": "Kalimat simple present yang benar adalah?", "options": ["She study every day", "She studies every day", "She studied every day", "She studying every day"], "correctIndex": 1, "tags": ["bahasa-inggris", "grammar", "simple-present"]},
+            {"question": "Bentuk past dari 'visit' adalah?", "options": ["Visits", "Visited", "Visiting", "Visitor"], "correctIndex": 1, "tags": ["bahasa-inggris", "grammar", "simple-past"]},
+            {"question": "Main idea berarti?", "options": ["Ide utama", "Kata kerja", "Kalimat tanya", "Contoh tambahan"], "correctIndex": 0, "tags": ["bahasa-inggris", "reading", "main-idea"]},
+            {"question": "Object pronoun untuk 'they' adalah?", "options": ["Their", "Them", "They", "Theirs"], "correctIndex": 1, "tags": ["bahasa-inggris", "pronoun"]},
+            {"question": "Kata 'assignment' paling dekat artinya dengan?", "options": ["Tugas", "Liburan", "Kantin", "Peta"], "correctIndex": 0, "tags": ["bahasa-inggris", "vocabulary", "school"]},
+            {"question": "Bagian paragraf yang berisi ide utama disebut?", "options": ["Topic sentence", "Footnote", "Caption", "Title page"], "correctIndex": 0, "tags": ["bahasa-inggris", "writing", "paragraph"]},
+            {"question": "Kalimat 'I ... breakfast at 7' paling tepat diisi?", "options": ["has", "have", "having", "haded"], "correctIndex": 1, "tags": ["bahasa-inggris", "daily-activities"]},
+            {"question": "Dalam listening, kata kunci disebut?", "options": ["Keyword", "Silent word", "Footnote", "Paragraph"], "correctIndex": 0, "tags": ["bahasa-inggris", "listening", "keyword"]},
+            {"question": "Pronoun yang tepat untuk 'Rina' adalah?", "options": ["He", "She", "They", "We"], "correctIndex": 1, "tags": ["bahasa-inggris", "pronoun"]},
+            {"question": "Kalimat simple past biasanya memakai penanda waktu?", "options": ["Every day", "Usually", "Yesterday", "Always"], "correctIndex": 2, "tags": ["bahasa-inggris", "simple-past"]},
+        ],
+    },
+    {
+        "id": "Bahasa Indonesia",
+        "title": "Bahasa Indonesia",
+        "icon": "BookOpen",
+        "color": "#ef4444",
+        "tags": ["bahasa-indonesia", "literasi", "teks", "menulis", "membaca"],
+        "questions": [
+            {"question": "Gagasan utama dalam paragraf disebut?", "options": ["Ide pokok", "Catatan kaki", "Sinonim", "Dialog"], "correctIndex": 0, "tags": ["bahasa-indonesia", "ide-pokok"]},
+            {"question": "Teks yang menjelaskan proses terjadinya fenomena disebut?", "options": ["Teks eksplanasi", "Teks anekdot", "Puisi", "Pantun"], "correctIndex": 0, "tags": ["bahasa-indonesia", "teks-eksplanasi"]},
+            {"question": "Pernyataan yang dapat dibuktikan kebenarannya disebut?", "options": ["Opini", "Fakta", "Saran", "Perintah"], "correctIndex": 1, "tags": ["bahasa-indonesia", "fakta"]},
+            {"question": "Ringkasan yang baik harus?", "options": ["Lebih panjang dari teks asli", "Mengubah makna teks", "Singkat dan akurat", "Berisi semua contoh"], "correctIndex": 2, "tags": ["bahasa-indonesia", "ringkasan"]},
+            {"question": "Teks persuasi bertujuan untuk?", "options": ["Menghibur tanpa pesan", "Mempengaruhi pembaca", "Mendaftar istilah", "Menghitung data"], "correctIndex": 1, "tags": ["bahasa-indonesia", "persuasi"]},
+            {"question": "Huruf kapital dipakai pada?", "options": ["Awal kalimat", "Semua kata benda", "Setiap tanda koma", "Semua kata kerja"], "correctIndex": 0, "tags": ["bahasa-indonesia", "puebi", "ejaan"]},
+            {"question": "Kalimat utama biasanya memuat?", "options": ["Ide pokok", "Hiasan kalimat", "Nomor halaman", "Daftar pustaka"], "correctIndex": 0, "tags": ["bahasa-indonesia", "kalimat-utama"]},
+            {"question": "Bagian teks eksplanasi yang menjelaskan proses disebut?", "options": ["Deretan penjelas", "Orientasi tokoh", "Koda", "Refrain"], "correctIndex": 0, "tags": ["bahasa-indonesia", "struktur-teks"]},
+            {"question": "Opini biasanya ditandai oleh?", "options": ["Data pasti", "Pendapat atau penilaian", "Tanggal resmi", "Hasil pengukuran"], "correctIndex": 1, "tags": ["bahasa-indonesia", "opini"]},
+            {"question": "Dalam teks persuasi, alasan dan bukti dipakai untuk menguatkan?", "options": ["Klaim", "Tanda baca", "Daftar isi", "Judul bab"], "correctIndex": 0, "tags": ["bahasa-indonesia", "argumen"]},
+        ],
+    },
+    {
+        "id": "Sejarah",
+        "title": "Sejarah Indonesia",
+        "icon": "Landmark",
+        "color": "#a16207",
+        "tags": ["sejarah", "indonesia", "kolonialisme", "kemerdekaan", "peradaban"],
+        "questions": [
+            {"question": "Organisasi yang sering dikaitkan dengan awal pergerakan nasional adalah?", "options": ["Budi Utomo", "VOC", "PBB", "ASEAN"], "correctIndex": 0, "tags": ["sejarah", "pergerakan-nasional"]},
+            {"question": "Proklamasi kemerdekaan Indonesia dibacakan pada tahun?", "options": ["1908", "1928", "1945", "1949"], "correctIndex": 2, "tags": ["sejarah", "proklamasi"]},
+            {"question": "Kolonialisme berhubungan dengan?", "options": ["Penguasaan wilayah oleh bangsa lain", "Pemilihan umum", "Pertanian lokal saja", "Seni musik"], "correctIndex": 0, "tags": ["sejarah", "kolonialisme"]},
+            {"question": "Kerajaan maritim Hindu-Buddha yang kuat di Sumatra adalah?", "options": ["Sriwijaya", "Demak", "Banten", "Mataram Islam"], "correctIndex": 0, "tags": ["sejarah", "hindu-buddha", "kerajaan"]},
+            {"question": "Samudra Pasai dikenal sebagai kerajaan bercorak?", "options": ["Hindu", "Buddha", "Islam", "Romawi"], "correctIndex": 2, "tags": ["sejarah", "islam", "kerajaan"]},
+            {"question": "Sumber sejarah primer contohnya adalah?", "options": ["Prasasti", "Buku ringkasan modern", "Film fiksi", "Komentar media sosial"], "correctIndex": 0, "tags": ["sejarah", "sumber-sejarah"]},
+            {"question": "Sumpah Pemuda terjadi pada tahun?", "options": ["1908", "1928", "1945", "1965"], "correctIndex": 1, "tags": ["sejarah", "pergerakan-nasional"]},
+            {"question": "Majapahit dikenal sebagai kerajaan bercorak?", "options": ["Hindu-Buddha", "Islam", "Kolonial", "Modern"], "correctIndex": 0, "tags": ["sejarah", "hindu-buddha"]},
+            {"question": "Perdagangan menjadi salah satu jalur penting penyebaran?", "options": ["Islam di Nusantara", "Salju di tropis", "Teknologi nuklir kuno", "Bahasa Latin saja"], "correctIndex": 0, "tags": ["sejarah", "islam", "perdagangan"]},
+            {"question": "Kajian buku sejarah modern biasanya termasuk sumber?", "options": ["Primer", "Sekunder", "Fosil", "Lisan murni"], "correctIndex": 1, "tags": ["sejarah", "sumber-sejarah"]},
+        ],
+    },
+    {
+        "id": "Geografi",
+        "title": "Geografi",
+        "icon": "Map",
+        "color": "#06b6d4",
+        "tags": ["geografi", "peta", "bumi", "lingkungan", "spasial"],
+        "questions": [
+            {"question": "Konsep geografi yang menjawab pertanyaan 'di mana' adalah?", "options": ["Lokasi", "Morfologi", "Aglomerasi", "Nilai guna"], "correctIndex": 0, "tags": ["geografi", "lokasi"]},
+            {"question": "Unsur peta yang menjelaskan arti simbol disebut?", "options": ["Legenda", "Judul", "Inset", "Grid"], "correctIndex": 0, "tags": ["geografi", "peta", "legenda"]},
+            {"question": "Lapisan bumi yang paling luar disebut?", "options": ["Inti dalam", "Litosfer", "Astenosfer", "Barisfer"], "correctIndex": 1, "tags": ["geografi", "litosfer"]},
+            {"question": "Kondisi atmosfer dalam waktu singkat disebut?", "options": ["Iklim", "Cuaca", "Musim", "Biosfer"], "correctIndex": 1, "tags": ["geografi", "cuaca"]},
+            {"question": "Pemanfaatan sumber daya yang menjaga kebutuhan masa depan disebut?", "options": ["Berkelanjutan", "Eksploitatif", "Konsumtif", "Instan"], "correctIndex": 0, "tags": ["geografi", "berkelanjutan"]},
+            {"question": "Upaya mengurangi risiko sebelum bencana disebut?", "options": ["Mitigasi", "Evakuasi akhir", "Rekreasi", "Urbanisasi"], "correctIndex": 0, "tags": ["geografi", "mitigasi", "bencana"]},
+            {"question": "Skala peta digunakan untuk membandingkan jarak peta dengan?", "options": ["Jarak sebenarnya", "Warna peta", "Legenda", "Judul"], "correctIndex": 0, "tags": ["geografi", "skala"]},
+            {"question": "Iklim dipengaruhi oleh salah satunya?", "options": ["Lintang tempat", "Nomor rumah", "Warna pakaian", "Jenis pena"], "correctIndex": 0, "tags": ["geografi", "iklim"]},
+            {"question": "Indonesia rawan gempa karena berada di pertemuan?", "options": ["Lempeng tektonik", "Jalur kereta", "Garis telepon", "Hutan mangrove"], "correctIndex": 0, "tags": ["geografi", "tektonik", "bencana"]},
+            {"question": "Sumber daya alam yang tidak dapat diperbarui contohnya?", "options": ["Minyak bumi", "Air hujan", "Sinar matahari", "Angin"], "correctIndex": 0, "tags": ["geografi", "sumber-daya-alam"]},
+        ],
+    },
+    {
+        "id": "Informatika",
+        "title": "Informatika dan Data",
+        "icon": "Cpu",
+        "color": "#0f766e",
+        "tags": ["informatika", "algoritma", "data", "komputasi", "machine-learning"],
+        "questions": [
+            {"question": "Langkah logis untuk menyelesaikan masalah disebut?", "options": ["Algoritma", "Poster", "Legenda", "Kamus"], "correctIndex": 0, "tags": ["informatika", "algoritma"]},
+            {"question": "Flowchart digunakan untuk?", "options": ["Menggambar alur proses", "Mengukur suhu", "Membuat peta topografi", "Menghafal tanggal"], "correctIndex": 0, "tags": ["informatika", "flowchart"]},
+            {"question": "Struktur data dengan prinsip last in, first out adalah?", "options": ["Queue", "Stack", "Array", "Tree"], "correctIndex": 1, "tags": ["informatika", "stack", "struktur-data"]},
+            {"question": "Struktur data dengan prinsip first in, first out adalah?", "options": ["Queue", "Stack", "Set", "Graph"], "correctIndex": 0, "tags": ["informatika", "queue", "struktur-data"]},
+            {"question": "Dalam machine learning, informasi masukan untuk model disebut?", "options": ["Fitur", "Legenda", "Footer", "Paragraf"], "correctIndex": 0, "tags": ["informatika", "machine-learning", "fitur-label"]},
+            {"question": "Target yang ingin diprediksi model disebut?", "options": ["Label", "Theme", "Cache", "Icon"], "correctIndex": 0, "tags": ["informatika", "machine-learning", "fitur-label"]},
+            {"question": "Kumpulan data terstruktur disebut?", "options": ["Dataset", "Clipboard", "Toolbar", "Caption"], "correctIndex": 0, "tags": ["informatika", "dataset", "data"]},
+            {"question": "Percabangan dalam program biasanya memakai konsep?", "options": ["If/else", "Judul", "Legenda", "Sinonim"], "correctIndex": 0, "tags": ["informatika", "pemrograman", "percabangan"]},
+            {"question": "Autentikasi dua faktor berguna untuk?", "options": ["Meningkatkan keamanan akun", "Menghapus semua data", "Mempercepat hujan", "Membuat peta"], "correctIndex": 0, "tags": ["informatika", "keamanan-digital"]},
+            {"question": "Tag materi/kuis pada sistem rekomendasi dapat menjadi?", "options": ["Fitur kategorikal", "Warna acak saja", "Pengganti password", "File gambar"], "correctIndex": 0, "tags": ["informatika", "machine-learning", "rekomendasi"]},
+        ],
+    },
 ]
+
+
+def get_tags_for_quiz(subject: str) -> list[str]:
+    for quiz in QUIZZES_DATA:
+        if quiz["id"] == subject or quiz["title"] == subject:
+            return list(quiz.get("tags", []))
+    normalized = subject.lower().replace("_", "-").replace(" ", "-")
+    return [normalized]

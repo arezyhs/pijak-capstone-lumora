@@ -2,12 +2,16 @@ export interface Material {
   title: string;
   type: string;
   priority: number;
+  tags: string[];
 }
 
 export interface RecommendationResponse {
   student_id: string;
   difficulty: string;
+  model_used: boolean;
+  confidence: number;
   recommended_topics: string[];
+  recommended_tags: string[];
   materials: Material[];
   reason: string;
 }
@@ -39,6 +43,43 @@ export interface TeacherOverview {
   average_score: number;
   risk_topics: string[];
   students_need_attention: string[];
+  students: AdminStudentItem[];
+}
+
+export interface AdminStudentItem {
+  id: number;
+  user_id: string;
+  name: string;
+  department: string;
+  sleep_hours: number;
+  stress_level: number;
+  age: number;
+  gender: string;
+  internet_access: string;
+  family_income: string;
+  parent_edu: string;
+  extracurricular: string;
+  total_quizzes: number;
+  completed_materials: number;
+  average_score: number;
+  completion_rate: number;
+  risk_level: 'low' | 'medium' | 'high';
+  weak_subjects: string[];
+}
+
+export interface AdminStudentPayload {
+  user_id: string;
+  name: string;
+  department: string;
+  password?: string;
+  sleep_hours: number;
+  stress_level: number;
+  age: number;
+  gender: string;
+  internet_access: string;
+  family_income: string;
+  parent_edu: string;
+  extracurricular: string;
 }
 
 export interface QuizSubmission {

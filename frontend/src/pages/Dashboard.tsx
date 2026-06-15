@@ -1,45 +1,126 @@
-import { useEffect, useState } from 'react'
-import { Brain, ClipboardCheck, Activity, GraduationCap, ArrowRight, BookOpen, Lightbulb, Sparkles, Target, ChevronRight } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
+import {
+  Activity,
+  AlertTriangle,
+  ArrowRight,
+  BarChart3,
+  BookOpen,
+  Brain,
+  CheckCircle2,
+  ChevronRight,
+  ClipboardCheck,
+  Gauge,
+  GraduationCap,
+  Lightbulb,
+  Route,
+  Sparkles,
+  Tags,
+  Target,
+  TrendingDown,
+} from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { fetchStudentDashboard } from '../api/client'
-import type { DashboardResponse } from '../types'
+import { fetchMaterials, fetchQuizzes, fetchStudentDashboard, fetchStudentHistory } from '../api/client'
+import type { DashboardResponse, StudentHistoryResponse } from '../types'
 
-// --- Tips & Tricks Data ---
-const TIPS = [
-  {
-    title: 'Teknik Pomodoro untuk Belajar Efektif',
-    body: 'Belajar selama 25 menit, istirahat 5 menit. Setelah 4 siklus, ambil istirahat panjang 15-30 menit. Metode ini meningkatkan fokus hingga 40% berdasarkan riset Universitas Illinois.',
-    tag: 'Produktivitas',
-  },
-  {
-    title: 'Spaced Repetition: Mengingat Lebih Lama',
-    body: 'Jangan cram! Ulangi materi dengan jeda waktu yang semakin panjang: 1 hari → 3 hari → 7 hari → 14 hari. Otak Anda memindahkan informasi dari memori jangka pendek ke jangka panjang jauh lebih efektif dengan cara ini.',
-    tag: 'Memori',
-  },
-  {
-    title: 'Active Recall: Uji Diri Sendiri',
-    body: 'Setelah membaca materi, tutup buku dan coba jelaskan ulang dengan kata-kata sendiri. Jika mentok, buka kembali hanya bagian yang lupa. Teknik ini 3x lebih efektif dibandingkan membaca ulang pasif.',
-    tag: 'Strategi',
-  },
-]
+type MaterialItem = {
+  id: string
+  title: string
+  type: 'video' | 'article'
+  duration: string
+  tags?: string[]
+  content?: string
+}
 
-// --- Actionable links for learning path ---
+type SubjectCategory = {
+  id: string
+  name: string
+  color: string
+  tags?: string[]
+  materials: MaterialItem[]
+}
+
+type QuizModule = {
+  id: string
+  title: string
+  color: string
+  tags?: string[]
+  questions: { tags?: string[] }[]
+}
+
 const PATH_ACTIONS: Record<string, { label: string; to: string }> = {
-  'review': { label: 'Buka Materi', to: '/materials' },
-  'latihan': { label: 'Mulai Kuis', to: '/quiz' },
-  'evaluasi': { label: 'Mulai Evaluasi', to: '/quiz' },
+  review: { label: 'Buka Materi', to: '/materials' },
+  latihan: { label: 'Mulai Kuis', to: '/quiz' },
+  evaluasi: { label: 'Mulai Evaluasi', to: '/quiz' },
 }
 
 function getPathAction(step: string): { label: string; to: string } {
   const lower = step.toLowerCase()
-  if (lower.includes('review') || lower.includes('baca') || lower.includes('pelajari')) return PATH_ACTIONS['review']
-  if (lower.includes('latihan') || lower.includes('soal') || lower.includes('praktik')) return PATH_ACTIONS['latihan']
-  if (lower.includes('evaluasi') || lower.includes('ujian') || lower.includes('kuis')) return PATH_ACTIONS['evaluasi']
-  return { label: 'Buka Materi', to: '/materials' }
+  if (lower.includes('review') || lower.includes('baca') || lower.includes('pelajari') || lower.includes('video')) return PATH_ACTIONS.review
+  if (lower.includes('latihan') || lower.includes('soal') || lower.includes('praktik')) return PATH_ACTIONS.latihan
+  if (lower.includes('evaluasi') || lower.includes('ujian') || lower.includes('kuis')) return PATH_ACTIONS.evaluasi
+  return PATH_ACTIONS.review
+}
+
+function normalizeTag(value: string): string {
+  return value.toLowerCase().replace(/_/g, '-').replace(/\s+/g, '-')
+}
+
+function scoreColor(score: number): string {
+  if (score >= 80) return 'var(--success)'
+  if (score >= 60) return 'var(--warning)'
+  return 'var(--danger)'
+}
+
+function buildAdaptiveTips(dashboard: DashboardResponse, weakSubjects: [string, number][]) {
+  const tags = dashboard.recommendation.recommended_tags
+  const tips = []
+
+  if (weakSubjects.length > 0) {
+    tips.push({
+      tag: 'Prioritas',
+      title: `Fokus 30 menit di ${weakSubjects[0][0]}`,
+      body: `Skor rata-rata terendah Anda ada di ${weakSubjects[0][0]} (${weakSubjects[0][1]}). Buka 1 materi bertag #${tags[0] ?? normalizeTag(weakSubjects[0][0])}, lalu langsung kerjakan kuis ulang.`,
+    })
+  }
+
+  if (dashboard.progress.completion_rate < 0.35) {
+    tips.push({
+      tag: 'Konsistensi',
+      title: 'Selesaikan satu materi pendek sebelum kuis',
+      body: `Progress materi baru ${Math.round(dashboard.progress.completion_rate * 100)}%. Sistem akan lebih akurat kalau Anda menandai materi selesai setelah benar-benar dipelajari.`,
+    })
+  }
+
+  if (dashboard.latest_quiz.score < 70) {
+    tips.push({
+      tag: 'Perbaikan',
+      title: 'Ulangi kuis setelah review tag lemah',
+      body: `Skor kuis terakhir ${dashboard.latest_quiz.score}. Jangan langsung lompat topik; baca materi rekomendasi, catat 3 poin sulit, lalu kerjakan evaluasi ulang.`,
+    })
+  } else {
+    tips.push({
+      tag: 'Akselerasi',
+      title: 'Naikkan level dengan latihan campuran',
+      body: `Skor terakhir ${dashboard.latest_quiz.score}. Pertahankan ritme dengan latihan dari tag yang sama dan satu tag baru agar pemahaman tidak terlalu sempit.`,
+    })
+  }
+
+  if (!dashboard.recommendation.model_used) {
+    tips.push({
+      tag: 'Data',
+      title: 'Model memakai fallback rule',
+      body: 'Model ML belum aktif atau gagal dipakai. Hasil tetap berdasarkan aturan skor/progres, tetapi prediksi akan lebih kuat setelah model tersedia.',
+    })
+  }
+
+  return tips.slice(0, 3)
 }
 
 export function Dashboard() {
   const [dashboard, setDashboard] = useState<DashboardResponse | null>(null)
+  const [history, setHistory] = useState<StudentHistoryResponse | null>(null)
+  const [materials, setMaterials] = useState<SubjectCategory[]>([])
+  const [quizzes, setQuizzes] = useState<QuizModule[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -48,17 +129,68 @@ export function Dashboard() {
       try {
         setLoading(true)
         const username = localStorage.getItem('username') || 'student1'
-        const data = await fetchStudentDashboard(username)
-        setDashboard(data)
+        const [dashboardData, historyData, materialData, quizData] = await Promise.all([
+          fetchStudentDashboard(username),
+          fetchStudentHistory(username),
+          fetchMaterials(),
+          fetchQuizzes(),
+        ])
+        setDashboard(dashboardData)
+        setHistory(historyData)
+        setMaterials(materialData)
+        setQuizzes(quizData)
       } catch (err) {
         console.error(err)
-        setError('Gagal mengambil data dari server. Pastikan backend FastAPI sedang berjalan (port 8000).')
+        setError('Gagal mengambil data dari server. Pastikan backend FastAPI sedang berjalan di port 8000.')
       } finally {
         setLoading(false)
       }
     }
     loadData()
   }, [])
+
+  const weakSubjects = useMemo<[string, number][]>(() => {
+    if (!history) return []
+    return Object.entries(history.score_by_subject)
+      .sort((a, b) => a[1] - b[1])
+      .map(([subject, avg]) => [subject, Number(avg.toFixed(1))])
+  }, [history])
+
+  const recommendedMaterials = useMemo(() => {
+    if (!dashboard) return []
+    const recommendedTags = new Set(dashboard.recommendation.recommended_tags.map(normalizeTag))
+    const weakSet = new Set(weakSubjects.map(([subject]) => normalizeTag(subject)))
+
+    return materials
+      .flatMap(category => category.materials.map(material => ({ category, material })))
+      .map(item => {
+        const materialTags = (item.material.tags ?? []).map(normalizeTag)
+        const categoryTags = (item.category.tags ?? []).map(normalizeTag)
+        const allTags = [...materialTags, ...categoryTags]
+        const tagMatches = allTags.filter(tag => recommendedTags.has(tag)).length
+        const subjectMatch = weakSet.has(normalizeTag(item.category.name)) || weakSet.has(normalizeTag(item.category.id)) ? 2 : 0
+        return { ...item, score: tagMatches + subjectMatch }
+      })
+      .filter(item => item.score > 0)
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 5)
+  }, [dashboard, materials, weakSubjects])
+
+  const targetQuiz = useMemo(() => {
+    if (!dashboard) return null
+    const recommendedTags = new Set(dashboard.recommendation.recommended_tags.map(normalizeTag))
+    const weakSet = new Set(weakSubjects.map(([subject]) => normalizeTag(subject)))
+
+    return quizzes
+      .map(quiz => {
+        const quizTags = (quiz.tags ?? []).map(normalizeTag)
+        const questionTags = quiz.questions.flatMap(question => question.tags ?? []).map(normalizeTag)
+        const tagMatches = [...quizTags, ...questionTags].filter(tag => recommendedTags.has(tag)).length
+        const subjectMatch = weakSet.has(normalizeTag(quiz.id)) || weakSet.has(normalizeTag(quiz.title)) ? 8 : 0
+        return { quiz, score: tagMatches + subjectMatch }
+      })
+      .sort((a, b) => b.score - a.score)[0]?.quiz ?? null
+  }, [dashboard, quizzes, weakSubjects])
 
   if (loading) {
     return (
@@ -72,24 +204,25 @@ export function Dashboard() {
   if (error || !dashboard) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '80vh', flexDirection: 'column', padding: '2rem', color: 'var(--danger)', textAlign: 'center' }}>
-        <h2 style={{ marginBottom: '8px' }}>Oops!</h2>
-        <p style={{ maxWidth: '400px', lineHeight: '1.6' }}>{error}</p>
+        <h2 style={{ marginBottom: '8px' }}>Dashboard belum tersedia</h2>
+        <p style={{ maxWidth: '460px', lineHeight: '1.6' }}>{error}</p>
       </div>
     )
   }
 
   const isNeedsAttention = ['Fundamental Level', 'Visual Learning Path', 'Microlearning Mode'].includes(dashboard.recommendation.difficulty)
-  const diffLabel = dashboard.recommendation.difficulty
+  const confidencePct = Math.round((dashboard.recommendation.confidence ?? 0) * 100)
+  const adaptiveTips = buildAdaptiveTips(dashboard, weakSubjects)
+  const primaryWeakSubject = weakSubjects[0]
 
   return (
     <div className="content">
-      {/* Header */}
       <header className="topbar" style={{ marginBottom: '4px' }}>
         <div>
           <p className="eyebrow">Overview AI</p>
           <h1>Dashboard Pembelajaran</h1>
         </div>
-        <div style={{ display: 'flex', gap: '12px' }}>
+        <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
           <Link to="/materials" className="btn-outline" style={{ display: 'flex', alignItems: 'center', gap: '6px', textDecoration: 'none' }}>
             <BookOpen size={18} /> Materi
           </Link>
@@ -99,17 +232,18 @@ export function Dashboard() {
         </div>
       </header>
 
-      {/* Hero — AI Status */}
-      <section className="hero-panel" style={isNeedsAttention ? { background: 'linear-gradient(135deg, #dc2626, #ef4444)' } : {}}>
+      <section className="hero-panel" style={isNeedsAttention ? { background: 'linear-gradient(135deg, #b91c1c, #ef4444)' } : {}}>
         <div style={{ zIndex: 2 }}>
-          <p className="eyebrow">Prediksi Model AI (Random Forest)</p>
-          <h2>{diffLabel}</h2>
-          <p style={{ fontSize: '15px', lineHeight: '1.6', opacity: 0.95 }}>{dashboard.recommendation.reason}</p>
-          {isNeedsAttention && (
-            <Link to="/materials" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', marginTop: '16px', padding: '10px 20px', background: 'rgba(255,255,255,0.2)', borderRadius: '10px', color: '#fff', textDecoration: 'none', fontWeight: '700', fontSize: '14px', backdropFilter: 'blur(4px)' }}>
-              <Sparkles size={16} /> Mulai perbaikan sekarang <ArrowRight size={16} />
-            </Link>
-          )}
+          <p className="eyebrow">Prediksi Model AI</p>
+          <h2>{dashboard.recommendation.difficulty}</h2>
+          <p style={{ fontSize: '15px', lineHeight: '1.6', opacity: 0.95 }}>
+            {dashboard.recommendation.reason}
+          </p>
+          <div className="dash-hero-tags">
+            <span><Brain size={14} /> {dashboard.recommendation.model_used ? 'Random Forest aktif' : 'Fallback rule aktif'}</span>
+            <span><Gauge size={14} /> Confidence {confidencePct}%</span>
+            {primaryWeakSubject && <span><TrendingDown size={14} /> Fokus: {primaryWeakSubject[0]}</span>}
+          </div>
         </div>
         <div style={{ display: 'flex', justifyContent: 'center', zIndex: 2 }}>
           <div className="score-ring">
@@ -119,7 +253,6 @@ export function Dashboard() {
         </div>
       </section>
 
-      {/* Metrics */}
       <div className="metric-grid">
         <article>
           <Activity size={24} />
@@ -128,31 +261,34 @@ export function Dashboard() {
         </article>
         <article>
           <GraduationCap size={24} />
-          <span>Streak Belajar</span>
-          <strong>{dashboard.progress.current_streak} Hari</strong>
+          <span>Total Kuis</span>
+          <strong>{history?.total_quizzes ?? 0}</strong>
         </article>
         <article>
           <Brain size={24} />
           <span>Kuis Terakhir ({dashboard.latest_quiz.subject})</span>
-          <strong style={dashboard.latest_quiz.score < 70 ? { color: 'var(--danger)' } : { color: 'var(--success)' }}>
+          <strong style={{ color: scoreColor(dashboard.latest_quiz.score) }}>
             {dashboard.latest_quiz.score}
           </strong>
         </article>
       </div>
 
-      {/* Learning Path with actionable links */}
       <section className="panel">
         <div className="panel-heading">
           <div>
-            <h2 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><Target size={20} color="var(--accent-primary)" /> Peta Kurikulum AI</h2>
-            <p style={{ color: 'var(--muted)', fontSize: '13px', marginTop: '4px' }}>Ikuti langkah-langkah berikut secara berurutan untuk hasil optimal.</p>
+            <h2 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Route size={20} color="var(--accent-primary)" /> Peta Kurikulum AI
+            </h2>
+            <p style={{ color: 'var(--muted)', fontSize: '13px', marginTop: '4px' }}>
+              Rute ini dibuat dari skor kuis, progres materi, tag lemah, dan prediksi model.
+            </p>
           </div>
         </div>
         <div className="dash-path-list">
-          {dashboard.learning_path.map((step: string, i: number) => {
+          {dashboard.learning_path.map((step, i) => {
             const action = getPathAction(step)
             return (
-              <Link to={action.to} key={i} className="dash-path-item" style={{ textDecoration: 'none' }}>
+              <Link to={action.to} key={step} className="dash-path-item" style={{ textDecoration: 'none' }}>
                 <div className="dash-path-num">{i + 1}</div>
                 <div className="dash-path-body">
                   <strong>{step}</strong>
@@ -167,64 +303,105 @@ export function Dashboard() {
         </div>
       </section>
 
-      {/* Two columns: Recommended Topics + Tips */}
       <div className="workspace-grid">
-        {/* Topik Rekomendasi with links */}
         <section className="panel">
           <div className="panel-heading">
-            <h2>Topik Rekomendasi</h2>
-            <span style={{
-              backgroundColor: isNeedsAttention ? 'rgba(239, 68, 68, 0.1)' : 'rgba(16, 185, 129, 0.1)',
-              color: isNeedsAttention ? 'var(--danger)' : 'var(--success)',
-              padding: '6px 12px', borderRadius: '8px', fontWeight: '700',
-            }}>
-              {diffLabel}
-            </span>
+            <h2 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Target size={20} color="var(--accent-primary)" /> Diagnosis Belajar
+            </h2>
           </div>
-          <div className="recommendation-list">
-            {dashboard.recommendation.recommended_topics.map((topic, i) => (
-              <Link to="/materials" key={i} style={{ textDecoration: 'none' }}>
-                <article className="dash-reco-item">
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <div style={{ width: '32px', height: '32px', borderRadius: '8px', display: 'grid', placeItems: 'center', background: 'var(--accent-glow)', color: 'var(--accent-primary)', fontWeight: '800', fontSize: '13px', flexShrink: 0 }}>
-                      {i + 1}
-                    </div>
-                    <div>
-                      <strong style={{ color: 'var(--ink)' }}>{topic}</strong>
-                      <span style={{ display: 'block', fontSize: '13px', color: 'var(--muted)' }}>Buka materi terkait →</span>
-                    </div>
-                  </div>
-                  <ChevronRight size={18} color="var(--muted)" />
-                </article>
-              </Link>
+
+          <div className="dash-signal-grid">
+            {weakSubjects.slice(0, 4).map(([subject, avg]) => (
+              <article key={subject} className="dash-signal-card">
+                <div>
+                  <span>{subject}</span>
+                  <strong style={{ color: scoreColor(avg) }}>{avg}</strong>
+                </div>
+                <div className="dash-score-track">
+                  <div style={{ width: `${avg}%`, background: scoreColor(avg) }} />
+                </div>
+              </article>
             ))}
-            {dashboard.recommendation.materials.map((mat, i) => (
-              <Link to="/materials" key={`mat-${i}`} style={{ textDecoration: 'none' }}>
-                <article className="dash-reco-item">
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <div style={{ width: '32px', height: '32px', borderRadius: '8px', display: 'grid', placeItems: 'center', background: 'rgba(245, 158, 11, 0.1)', color: 'var(--warning)', flexShrink: 0 }}>
-                      <BookOpen size={16} />
-                    </div>
-                    <div>
-                      <strong style={{ color: 'var(--ink)' }}>{mat.title}</strong>
-                      <span style={{ display: 'block', fontSize: '13px', color: 'var(--muted)' }}>{mat.type} · Buka materi →</span>
-                    </div>
-                  </div>
-                  <ChevronRight size={18} color="var(--muted)" />
-                </article>
-              </Link>
+          </div>
+
+          <div className="content-tags" style={{ marginTop: '18px' }}>
+            {dashboard.recommendation.recommended_tags.map(tag => (
+              <span key={tag}><Tags size={12} /> #{tag}</span>
             ))}
           </div>
         </section>
 
-        {/* Tips & Tricks */}
+        <section className="panel">
+          <div className="panel-heading">
+            <h2 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Sparkles size={20} color="var(--warning)" /> Aksi Berikutnya
+            </h2>
+          </div>
+          <div className="dash-next-actions">
+            <Link to="/materials" className="dash-action-card">
+              <BookOpen size={20} />
+              <div>
+                <strong>Baca materi paling cocok</strong>
+                <span>{recommendedMaterials[0]?.material.title ?? 'Buka materi sesuai tag rekomendasi'}</span>
+              </div>
+              <ChevronRight size={18} />
+            </Link>
+            <Link to="/quiz" className="dash-action-card">
+              <ClipboardCheck size={20} />
+              <div>
+                <strong>Kerjakan kuis target</strong>
+                <span>{targetQuiz ? `${targetQuiz.title} - ${targetQuiz.questions.length} soal` : 'Pilih modul kuis sesuai topik lemah'}</span>
+              </div>
+              <ChevronRight size={18} />
+            </Link>
+          </div>
+        </section>
+      </div>
+
+      <div className="workspace-grid">
+        <section className="panel">
+          <div className="panel-heading">
+            <h2>Materi yang Direkomendasikan</h2>
+            <span className="dash-model-badge">{recommendedMaterials.length} cocok</span>
+          </div>
+          <div className="recommendation-list">
+            {recommendedMaterials.length > 0 ? recommendedMaterials.map(({ category, material }) => (
+              <Link to="/materials" key={material.id} style={{ textDecoration: 'none' }}>
+                <article className="dash-reco-item">
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <div style={{ width: '36px', height: '36px', borderRadius: '8px', display: 'grid', placeItems: 'center', background: `${category.color}15`, color: category.color, flexShrink: 0 }}>
+                      <BookOpen size={17} />
+                    </div>
+                    <div>
+                      <strong>{material.title}</strong>
+                      <span>{category.name} · {material.type} · {material.duration}</span>
+                      <div className="dash-mini-tags">
+                        {(material.tags ?? []).slice(0, 3).map(tag => <em key={tag}>#{tag}</em>)}
+                      </div>
+                    </div>
+                  </div>
+                  <ChevronRight size={18} color="var(--muted)" />
+                </article>
+              </Link>
+            )) : (
+              <div className="dash-empty-state">
+                <AlertTriangle size={20} />
+                <span>Belum ada materi yang cocok dengan tag rekomendasi. Coba kerjakan kuis terbaru untuk memperbarui sinyal.</span>
+              </div>
+            )}
+          </div>
+        </section>
+
         <section className="panel" style={{ background: 'linear-gradient(to bottom, #ffffff, var(--surface-alt))' }}>
           <div className="panel-heading">
-            <h2 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><Lightbulb size={20} color="var(--warning)" /> Tips Belajar Cerdas</h2>
+            <h2 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Lightbulb size={20} color="var(--warning)" /> Tips Belajar Adaptif
+            </h2>
           </div>
           <div className="dash-tips-list">
-            {TIPS.map((tip, i) => (
-              <article key={i} className="dash-tip-card">
+            {adaptiveTips.map(tip => (
+              <article key={tip.title} className="dash-tip-card">
                 <div className="dash-tip-tag">{tip.tag}</div>
                 <h3>{tip.title}</h3>
                 <p>{tip.body}</p>
@@ -233,6 +410,36 @@ export function Dashboard() {
           </div>
         </section>
       </div>
+
+      <section className="panel">
+        <div className="panel-heading">
+          <h2 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <BarChart3 size={20} color="var(--accent-primary)" /> Transparansi Sinyal Model
+          </h2>
+        </div>
+        <div className="dash-model-grid">
+          <article>
+            <CheckCircle2 size={18} />
+            <span>Input skor rata-rata</span>
+            <strong>{dashboard.progress.average_score}</strong>
+          </article>
+          <article>
+            <CheckCircle2 size={18} />
+            <span>Input progres materi</span>
+            <strong>{Math.round(dashboard.progress.completion_rate * 100)}%</strong>
+          </article>
+          <article>
+            <CheckCircle2 size={18} />
+            <span>Tag rekomendasi</span>
+            <strong>{dashboard.recommendation.recommended_tags.length}</strong>
+          </article>
+          <article>
+            <CheckCircle2 size={18} />
+            <span>Status model</span>
+            <strong>{dashboard.recommendation.model_used ? 'ML aktif' : 'Rule fallback'}</strong>
+          </article>
+        </div>
+      </section>
     </div>
   )
 }

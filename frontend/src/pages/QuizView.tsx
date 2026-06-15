@@ -1,13 +1,14 @@
 import { useState, useEffect, type ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { submitQuiz, fetchQuizzes } from '../api/client'
-import { BookOpen, Calculator, BrainCircuit, Activity, CheckCircle2, XCircle, ArrowLeft } from 'lucide-react'
+import { BookOpen, Calculator, BrainCircuit, Activity, CheckCircle2, XCircle, ArrowLeft, Languages, Landmark, Map, Cpu } from 'lucide-react'
 
 // --- Data Types ---
 type Question = {
   question: string
   options: string[]
   correctIndex: number
+  tags?: string[]
 }
 
 type Module = {
@@ -15,13 +16,19 @@ type Module = {
   title: string
   icon: string | ReactNode
   color: string
+  tags?: string[]
   questions: Question[]
 }
 
 const ICON_MAP: Record<string, ReactNode> = {
   "Calculator": <Calculator size={24} />,
   "Activity": <Activity size={24} />,
-  "BrainCircuit": <BrainCircuit size={24} />
+  "BrainCircuit": <BrainCircuit size={24} />,
+  "Languages": <Languages size={24} />,
+  "Landmark": <Landmark size={24} />,
+  "Map": <Map size={24} />,
+  "Cpu": <Cpu size={24} />,
+  "BookOpen": <BookOpen size={24} />
 }
 
 // --- Component ---
@@ -143,6 +150,11 @@ export function QuizView() {
               <p style={{ color: 'var(--muted)', textAlign: 'center', fontSize: '14px' }}>
                 {mod.questions.length} soal pilihan ganda · AI akan menyesuaikan kurikulum Anda berdasarkan hasil.
               </p>
+              {mod.tags && mod.tags.length > 0 && (
+                <div className="content-tags compact" style={{ justifyContent: 'center' }}>
+                  {mod.tags.slice(0, 4).map(tag => <span key={tag}>#{tag}</span>)}
+                </div>
+              )}
             </div>
           ))}
         </div>
@@ -205,6 +217,11 @@ export function QuizView() {
                         Jawaban Anda: <strong style={{ color: isCorrect ? 'var(--success)' : 'var(--danger)' }}>{answers[i] !== null ? q.options[answers[i]] : '(Tidak dijawab)'}</strong>
                         {!isCorrect && <> · Jawaban benar: <strong style={{ color: 'var(--success)' }}>{q.options[q.correctIndex]}</strong></>}
                       </p>
+                      {q.tags && q.tags.length > 0 && (
+                        <div className="content-tags compact">
+                          {q.tags.slice(0, 3).map(tag => <span key={tag}>#{tag}</span>)}
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>

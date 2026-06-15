@@ -4,8 +4,12 @@ from datetime import datetime
 
 from app.core.database import get_db
 from app.models.student import Student, QuizProgress
-from app.api.auth import get_current_user, require_role, User
+from app.models.user import User as UserModel
+from app.api.auth import get_current_user, require_role, User, get_password_hash
 from app.schemas.learning import (
+    AdminStudentCreate,
+    AdminStudentItem,
+    AdminStudentUpdate,
     DashboardResponse,
     ProgressSummary,
     QuizSummary,
@@ -21,24 +25,67 @@ from app.schemas.learning import (
 )
 from app.services.recommender import recommend_learning_path
 from app.models.student import Student, QuizProgress, MaterialProgress
+from app.data.materials import get_total_material_count
 
 router = APIRouter()
 
 def seed_student_if_needed(db: Session, student_id: str):
-    """Seed dummy data for the MVP if student doesn't exist."""
+    """Create a blank student profile if the user exists but has no profile yet."""
     student = db.query(Student).filter(Student.user_id == student_id).first()
     if not student:
-        student = Student(user_id=student_id, name="Nadia Putri", department="Science")
+        student = Student(user_id=student_id, name=student_id, department="General")
         db.add(student)
         db.commit()
         db.refresh(student)
-        
-        # Add a couple of mock quiz records
-        quiz1 = QuizProgress(student_id=student.id, subject="Matematika", score=85.0)
-        quiz2 = QuizProgress(student_id=student.id, subject="Sains", score=45.0) # Poor score to trigger AI remedial
-        db.add_all([quiz1, quiz2])
-        db.commit()
     return student
+
+
+def summarize_student(db: Session, student: Student) -> AdminStudentItem:
+    quizzes = db.query(QuizProgress).filter(QuizProgress.student_id == student.id).all()
+    materials_count = db.query(MaterialProgress).filter(MaterialProgress.student_id == student.id).count()
+    scores = [quiz.score for quiz in quizzes]
+    average_score = round(sum(scores) / len(scores), 1) if scores else 0.0
+    completion_rate = min(1.0, materials_count / get_total_material_count())
+
+    subject_scores: dict[str, list[float]] = {}
+    for quiz in quizzes:
+        subject_scores.setdefault(quiz.subject, []).append(quiz.score)
+    weak_subjects = [
+        subject
+        for subject, values in sorted(
+            subject_scores.items(),
+            key=lambda item: sum(item[1]) / len(item[1])
+        )
+        if sum(values) / len(values) < 75
+    ][:3]
+
+    if student.stress_level >= 8 or (scores and average_score < 60):
+        risk_level = "high"
+    elif student.stress_level >= 7 or (scores and average_score < 75) or completion_rate < 0.25:
+        risk_level = "medium"
+    else:
+        risk_level = "low"
+
+    return AdminStudentItem(
+        id=student.id,
+        user_id=student.user_id,
+        name=student.name,
+        department=student.department,
+        sleep_hours=student.sleep_hours,
+        stress_level=student.stress_level,
+        age=student.age,
+        gender=student.gender,
+        internet_access=student.internet_access,
+        family_income=student.family_income,
+        parent_edu=student.parent_edu,
+        extracurricular=student.extracurricular,
+        total_quizzes=len(quizzes),
+        completed_materials=materials_count,
+        average_score=average_score,
+        completion_rate=completion_rate,
+        risk_level=risk_level,
+        weak_subjects=weak_subjects,
+    )
 
 @router.post("/recommendations", response_model=RecommendationResponse)
 def create_recommendation(payload: RecommendationRequest) -> RecommendationResponse:
@@ -88,7 +135,7 @@ def submit_quiz(student_id: str, payload: QuizSubmission, db: Session = Depends(
     
     # Calculate dynamic completion rate
     completed_materials_count = db.query(MaterialProgress).filter(MaterialProgress.student_id == student.id).count()
-    completion_rate = min(1.0, completed_materials_count / 9.0) # Assume 9 total materials for MVP
+    completion_rate = min(1.0, completed_materials_count / get_total_material_count())
     
     # Trigger AI recommender to get the new path difficulty
     recommendation = recommend_learning_path(
@@ -123,22 +170,34 @@ def get_student_dashboard(student_id: str, db: Session = Depends(get_db), curren
     
     # 2. Get latest quiz
     latest_quiz_record = db.query(QuizProgress).filter(QuizProgress.student_id == student.id).order_by(QuizProgress.submitted_at.desc()).first()
-    if not latest_quiz_record:
-        raise HTTPException(status_code=404, detail="No quiz records found for student")
-        
-    # 3. Calculate avg score
+
+    # 3. Calculate avg score and weakest subjects
     all_quizzes = db.query(QuizProgress).filter(QuizProgress.student_id == student.id).all()
-    avg_score = sum(q.score for q in all_quizzes) / len(all_quizzes)
+    avg_score = sum(q.score for q in all_quizzes) / len(all_quizzes) if all_quizzes else 0.0
+    subject_scores: dict[str, list[float]] = {}
+    for quiz in all_quizzes:
+        subject_scores.setdefault(quiz.subject, []).append(quiz.score)
+    score_by_subject = {
+        subject: sum(scores) / len(scores)
+        for subject, scores in subject_scores.items()
+    }
+    ranked_subjects = sorted(score_by_subject.items(), key=lambda item: item[1])
+    target_subject = ranked_subjects[0][0] if ranked_subjects else "Matematika"
+    weak_topics = [
+        subject
+        for subject, score in ranked_subjects
+        if score < 75
+    ][:3] or [target_subject]
     
     # Calculate dynamic completion rate
     completed_materials_count = db.query(MaterialProgress).filter(MaterialProgress.student_id == student.id).count()
-    completion_rate = min(1.0, completed_materials_count / 9.0) # Assume 9 total materials for MVP
+    completion_rate = min(1.0, completed_materials_count / get_total_material_count())
 
     # 4. Trigger AI Recommender
     recommendation = recommend_learning_path(
         RecommendationRequest(
             student_id=student_id,
-            subject=latest_quiz_record.subject,
+            subject=target_subject,
             quiz_score=avg_score,
             completion_rate=completion_rate,
             sleep_hours=student.sleep_hours,
@@ -149,31 +208,33 @@ def get_student_dashboard(student_id: str, db: Session = Depends(get_db), curren
             family_income=student.family_income,
             parent_edu=student.parent_edu,
             extracurricular=student.extracurricular,
-            weak_topics=[latest_quiz_record.subject],
+            weak_topics=weak_topics,
         )
     )
 
     # Create dynamic learning path based on recommendation difficulty
     path_steps = []
-    if recommendation.difficulty == "Fast-Track Program":
+    if not latest_quiz_record:
+        path_steps = ["Pilih Materi Pertama", "Kerjakan Kuis Diagnostik", "Lihat Rekomendasi AI"]
+    elif recommendation.difficulty == "Fast-Track Program":
         path_steps = ["Ambil Tantangan Ekstra", "Evaluasi Akhir Modul", "Sertifikasi Terselesaikan"]
     elif recommendation.difficulty == "Visual Learning Path":
         path_steps = ["Tonton Video Rangkuman", "Latihan Visual", "Ujian Ulang Visual"]
     elif recommendation.difficulty == "Microlearning Mode":
         path_steps = ["Manajemen Stres", "Microlearning 5 Menit", "Kuis Singkat Santai"]
     elif recommendation.difficulty == "Fundamental Level":
-        path_steps = [f"Review Dasar {latest_quiz_record.subject}", "Latihan Terbimbing", "Evaluasi Ulang"]
+        path_steps = [f"Review Dasar {target_subject}", "Latihan Terbimbing", "Evaluasi Ulang"]
     else:
-        path_steps = [f"Pelajari Modul Inti {latest_quiz_record.subject}", "Latihan Mandiri", "Evaluasi Menengah"]
+        path_steps = [f"Pelajari Modul Inti {target_subject}", "Latihan Mandiri", "Evaluasi Menengah"]
 
     return DashboardResponse(
         student_id=student_id,
         name=student.name,
         progress=ProgressSummary(completion_rate=completion_rate, average_score=round(avg_score, 1), current_streak=3),
         latest_quiz=QuizSummary(
-            subject=latest_quiz_record.subject, 
-            score=latest_quiz_record.score, 
-            submitted_at=latest_quiz_record.submitted_at.isoformat()
+            subject=latest_quiz_record.subject if latest_quiz_record else "Belum ada kuis",
+            score=latest_quiz_record.score if latest_quiz_record else 0.0,
+            submitted_at=latest_quiz_record.submitted_at.isoformat() if latest_quiz_record else "",
         ),
         recommendation=recommendation,
         learning_path=path_steps,
@@ -240,6 +301,7 @@ def get_student_history(
 def get_teacher_overview(db: Session = Depends(get_db), current_user: User = Depends(require_role("teacher"))) -> TeacherOverview:
     students = db.query(Student).all()
     total_students = len(students)
+    student_items = [summarize_student(db, student) for student in students]
     
     if total_students == 0:
         return TeacherOverview(
@@ -247,26 +309,131 @@ def get_teacher_overview(db: Session = Depends(get_db), current_user: User = Dep
             average_completion_rate=0.0,
             average_score=0.0,
             risk_topics=[],
-            students_need_attention=[]
+            students_need_attention=[],
+            students=[],
         )
         
     all_quizzes = db.query(QuizProgress).all()
     avg_score = sum(q.score for q in all_quizzes) / len(all_quizzes) if all_quizzes else 0.0
     
     all_materials = db.query(MaterialProgress).count()
-    avg_completion = min(1.0, (all_materials / (total_students * 9.0)))
+    avg_completion = min(1.0, (all_materials / (total_students * get_total_material_count())))
     
-    attention_students = []
-    for s in students:
-        s_quizzes = [q.score for q in all_quizzes if q.student_id == s.id]
-        s_avg_score = sum(s_quizzes) / len(s_quizzes) if s_quizzes else 100
-        if s.stress_level >= 8 or s_avg_score < 60:
-            attention_students.append(f"{s.name} ({s.user_id}) - Stres: {s.stress_level}/10, Skor: {s_avg_score:.1f}")
+    attention_students = [
+        f"{student.name} ({student.user_id}) - Risiko: {student.risk_level}, Skor: {student.average_score:.1f}, Stres: {student.stress_level}/10"
+        for student in student_items
+        if student.risk_level == "high"
+    ]
+    risk_topics = sorted({
+        subject
+        for student in student_items
+        for subject in student.weak_subjects
+    })
 
     return TeacherOverview(
         total_students=total_students,
         average_completion_rate=avg_completion,
-        average_score=avg_score,
-        risk_topics=["Logika", "Matematika"], # Simplified for MVP
+        average_score=round(avg_score, 1),
+        risk_topics=risk_topics,
         students_need_attention=attention_students,
+        students=student_items,
     )
+
+
+@router.get("/admin/students", response_model=list[AdminStudentItem])
+def list_admin_students(db: Session = Depends(get_db), current_user: User = Depends(require_role("teacher"))) -> list[AdminStudentItem]:
+    students = db.query(Student).order_by(Student.name.asc()).all()
+    return [summarize_student(db, student) for student in students]
+
+
+@router.post("/admin/students", response_model=AdminStudentItem)
+def create_admin_student(payload: AdminStudentCreate, db: Session = Depends(get_db), current_user: User = Depends(require_role("teacher"))) -> AdminStudentItem:
+    existing_student = db.query(Student).filter(Student.user_id == payload.user_id).first()
+    if existing_student:
+        raise HTTPException(status_code=409, detail="Student user_id already exists")
+
+    existing_user = db.query(UserModel).filter(UserModel.username == payload.user_id).first()
+    if existing_user:
+        raise HTTPException(status_code=409, detail="Username already exists")
+
+    user = UserModel(username=payload.user_id, hashed_password=get_password_hash(payload.password), role="student")
+    student = Student(
+        user_id=payload.user_id,
+        name=payload.name,
+        department=payload.department,
+        sleep_hours=payload.sleep_hours,
+        stress_level=payload.stress_level,
+        age=payload.age,
+        gender=payload.gender,
+        internet_access=payload.internet_access,
+        family_income=payload.family_income,
+        parent_edu=payload.parent_edu,
+        extracurricular=payload.extracurricular,
+    )
+    db.add(user)
+    db.add(student)
+    db.commit()
+    db.refresh(student)
+    return summarize_student(db, student)
+
+
+@router.put("/admin/students/{student_id}", response_model=AdminStudentItem)
+def update_admin_student(student_id: int, payload: AdminStudentUpdate, db: Session = Depends(get_db), current_user: User = Depends(require_role("teacher"))) -> AdminStudentItem:
+    student = db.query(Student).filter(Student.id == student_id).first()
+    if not student:
+        raise HTTPException(status_code=404, detail="Student not found")
+
+    user = db.query(UserModel).filter(UserModel.username == student.user_id).first()
+    if payload.user_id and payload.user_id != student.user_id:
+        if db.query(Student).filter(Student.user_id == payload.user_id).first() or db.query(UserModel).filter(UserModel.username == payload.user_id).first():
+            raise HTTPException(status_code=409, detail="New user_id already exists")
+        if user:
+            user.username = payload.user_id
+        student.user_id = payload.user_id
+
+    for field in [
+        "name",
+        "department",
+        "sleep_hours",
+        "stress_level",
+        "age",
+        "gender",
+        "internet_access",
+        "family_income",
+        "parent_edu",
+        "extracurricular",
+    ]:
+        value = getattr(payload, field)
+        if value is not None:
+            setattr(student, field, value)
+
+    if payload.password and user:
+        user.hashed_password = get_password_hash(payload.password)
+
+    db.commit()
+    db.refresh(student)
+    return summarize_student(db, student)
+
+
+@router.delete("/admin/students/{student_id}")
+def delete_admin_student(student_id: int, db: Session = Depends(get_db), current_user: User = Depends(require_role("teacher"))):
+    student = db.query(Student).filter(Student.id == student_id).first()
+    if not student:
+        raise HTTPException(status_code=404, detail="Student not found")
+
+    user = db.query(UserModel).filter(UserModel.username == student.user_id, UserModel.role == "student").first()
+    db.delete(student)
+    if user:
+        db.delete(user)
+    db.commit()
+    return {"message": "Siswa dan akun login terkait berhasil dihapus"}
+
+
+@router.delete("/admin/reset-learning")
+def reset_learning_data(db: Session = Depends(get_db), current_user: User = Depends(require_role("teacher"))):
+    db.query(MaterialProgress).delete()
+    db.query(QuizProgress).delete()
+    db.query(Student).delete()
+    db.query(UserModel).filter(UserModel.role == "student").delete()
+    db.commit()
+    return {"message": "Database belajar direset. Akun guru tetap dipertahankan."}
