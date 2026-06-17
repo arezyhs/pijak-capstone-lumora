@@ -95,8 +95,8 @@ def register_user(payload: RegisterRequest, db: Session = Depends(get_db)):
         raise HTTPException(status_code=400, detail="Invalid role")
         
     if payload.role == "teacher":
-        expected_code = os.environ.get("TEACHER_INVITE_CODE", "lumora-admin-secret-123")
-        if payload.invite_code != expected_code:
+        expected_code = os.environ.get("TEACHER_INVITE_CODE")
+        if not expected_code or payload.invite_code != expected_code:
             raise HTTPException(status_code=403, detail="Invalid teacher invite code")
         
     existing_user = db.query(User).filter(User.username == payload.username).first()

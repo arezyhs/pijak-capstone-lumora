@@ -8,6 +8,7 @@ export function RegisterView() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [role, setRole] = useState('student');
+  const [inviteCode, setInviteCode] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -18,7 +19,9 @@ export function RegisterView() {
     setLoading(true);
 
     try {
-      const data = await registerApi({ username, name, password, role });
+      const payload: any = { username, name, password, role };
+      if (role === 'teacher') payload.invite_code = inviteCode;
+      const data = await registerApi(payload);
       localStorage.setItem('token', data.access_token);
       localStorage.setItem('role', data.role);
       localStorage.setItem('username', data.username);
@@ -143,6 +146,22 @@ export function RegisterView() {
                 <option value="teacher">Guru (Teacher)</option>
               </select>
             </div>
+            
+            {role === 'teacher' && (
+              <div>
+                <label style={{ display: 'block', fontWeight: '500', marginBottom: '8px', color: 'var(--ink)', fontSize: '14px' }}>Kode Registrasi Guru (Wajib)</label>
+                <input 
+                  type="password" 
+                  value={inviteCode}
+                  onChange={(e) => setInviteCode(e.target.value)}
+                  style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--surface-alt)', color: 'var(--ink)', outline: 'none', transition: 'border-color 0.2s', fontSize: '15px' }}
+                  placeholder="Masukkan kode rahasia admin"
+                  onFocus={e => e.target.style.borderColor = 'var(--accent-primary)'}
+                  onBlur={e => e.target.style.borderColor = 'var(--border)'}
+                  required
+                />
+              </div>
+            )}
             
             <button 
               type="submit" 

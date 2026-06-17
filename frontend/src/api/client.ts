@@ -29,7 +29,7 @@ export const loginApi = async (username: string, password: string) => {
   return response.data;
 };
 
-export const registerApi = async (payload: { username: string; name: string; password: string; role: string }) => {
+export const registerApi = async (payload: { username: string; name: string; password: string; role: string; invite_code?: string }) => {
   const response = await axios.post(`${import.meta.env.VITE_API_URL || '/api/v1'}/auth/register`, payload);
   return response.data;
 };
