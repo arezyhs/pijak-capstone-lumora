@@ -1,6 +1,6 @@
 # Lumora Frontend 🎨
 
-Antarmuka pengguna (UI) Lumora dibangun menggunakan ekosistem **React + TypeScript** dan dikonfigurasi menggunakan **Vite** untuk performa kompilasi yang super cepat. Aplikasi ini mengusung filosofi desain yang modern, *glassmorphism*, dinamis, dan responsif—sepenuhnya dikembangkan menggunakan Vanilla CSS untuk memastikan fleksibilitas gaya dan animasi tingkat piksel.
+Antarmuka pengguna (UI) Lumora dibangun menggunakan ekosistem **React + TypeScript** dan dikonfigurasi menggunakan **Vite** untuk performa kompilasi yang super cepat. Aplikasi ini mengusung filosofi desain yang bersih, bergaya *Notion-style*, bebas distraksi, dan responsif—sepenuhnya dikembangkan menggunakan Vanilla CSS untuk memastikan fleksibilitas gaya tingkat piksel.
 
 ---
 
