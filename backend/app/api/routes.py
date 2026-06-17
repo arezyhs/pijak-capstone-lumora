@@ -29,8 +29,10 @@ from app.data.materials import get_total_material_count
 
 router = APIRouter()
 
-def seed_student_if_needed(db: Session, student_id: str):
+def seed_student_if_needed(db: Session, student_id: str, current_user: User = None):
     """Create a blank student profile if the user exists but has no profile yet."""
+    if current_user and current_user.role != "teacher" and current_user.username != student_id:
+        raise HTTPException(status_code=403, detail="Forbidden")
     student = db.query(Student).filter(Student.user_id == student_id).first()
     if not student:
         user = db.query(UserModel).filter(UserModel.username == student_id).first()
@@ -95,7 +97,7 @@ def create_recommendation(payload: RecommendationRequest) -> RecommendationRespo
 
 @router.post("/students/{student_id}/complete_material")
 def complete_material(student_id: str, payload: MaterialCompletionRequest, db: Session = Depends(get_db), current_user: User = Depends(require_role("student"))):
-    student = seed_student_if_needed(db, student_id)
+    student = seed_student_if_needed(db, student_id, current_user)
     
     # Check if already completed
     existing = db.query(MaterialProgress).filter(
@@ -112,13 +114,13 @@ def complete_material(student_id: str, payload: MaterialCompletionRequest, db: S
 
 @router.get("/students/{student_id}/completed_materials", response_model=list[str])
 def get_completed_materials(student_id: str, db: Session = Depends(get_db), current_user: User = Depends(require_role("student"))):
-    student = seed_student_if_needed(db, student_id)
+    student = seed_student_if_needed(db, student_id, current_user)
     progress = db.query(MaterialProgress).filter(MaterialProgress.student_id == student.id).all()
     return [p.material_id for p in progress]
 
 @router.post("/students/{student_id}/profile")
 def update_student_profile(student_id: str, payload: UpdateProfileRequest, db: Session = Depends(get_db), current_user: User = Depends(require_role("student"))):
-    student = seed_student_if_needed(db, student_id)
+    student = seed_student_if_needed(db, student_id, current_user)
     student.sleep_hours = payload.sleep_hours
     student.stress_level = payload.stress_level
     student.age = payload.age
@@ -143,7 +145,7 @@ class ConditionRequest(BaseModel):
 
 @router.patch("/students/{student_id}/condition")
 def update_student_condition(student_id: str, payload: ConditionRequest, db: Session = Depends(get_db), current_user: User = Depends(require_role("student"))):
-    student = seed_student_if_needed(db, student_id)
+    student = seed_student_if_needed(db, student_id, current_user)
     student.sleep_hours = payload.sleep_hours
     student.stress_level = payload.stress_level
     
@@ -156,7 +158,7 @@ def update_student_condition(student_id: str, payload: ConditionRequest, db: Ses
 
 @router.post("/students/{student_id}/submit_quiz", response_model=QuizResult)
 def submit_quiz(student_id: str, payload: QuizSubmission, db: Session = Depends(get_db), current_user: User = Depends(require_role("student"))) -> QuizResult:
-    student = seed_student_if_needed(db, student_id)
+    student = seed_student_if_needed(db, student_id, current_user)
     
     # Save the new quiz
     new_quiz = QuizProgress(student_id=student.id, subject=payload.subject, score=payload.score)
@@ -196,7 +198,7 @@ def submit_quiz(student_id: str, payload: QuizSubmission, db: Session = Depends(
 @router.get("/students/{student_id}/dashboard", response_model=DashboardResponse)
 def get_student_dashboard(student_id: str, db: Session = Depends(get_db), current_user: User = Depends(require_role("student"))) -> DashboardResponse:
     # 1. Seed or retrieve student from database
-    student = seed_student_if_needed(db, student_id)
+    student = seed_student_if_needed(db, student_id, current_user)
     
     # 2. Get latest quiz
     latest_quiz_record = db.query(QuizProgress).filter(QuizProgress.student_id == student.id).order_by(QuizProgress.submitted_at.desc()).first()
@@ -277,7 +279,7 @@ def get_student_history(
     db: Session = Depends(get_db),
     current_user: User = Depends(require_role("student"))
 ) -> StudentHistoryResponse:
-    student = seed_student_if_needed(db, student_id)
+    student = seed_student_if_needed(db, student_id, current_user)
     all_quizzes = db.query(QuizProgress).filter(
         QuizProgress.student_id == student.id
     ).order_by(QuizProgress.submitted_at.desc()).all()
