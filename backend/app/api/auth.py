@@ -12,8 +12,10 @@ from app.models.user import User
 from app.models.student import Student
 from pydantic import BaseModel
 
+import os
+
 # --- Configuration ---
-SECRET_KEY = "lumora-super-secret-key"
+SECRET_KEY = os.environ.get("JWT_SECRET_KEY", "lumora-dev-secret-key-change-in-prod")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
