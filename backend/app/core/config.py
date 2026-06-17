@@ -7,7 +7,9 @@ class Settings(BaseSettings):
     cors_origins: list[str] = [
         "http://localhost:5173",
         "http://localhost:5174",
-        "http://localhost:5175"
+        "http://localhost:5175",
+        "https://lumora.vercel.app",
+        "https://pijak-capstone-lumora.vercel.app"
     ]
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")

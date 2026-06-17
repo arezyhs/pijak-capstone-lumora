@@ -39,6 +39,7 @@ class RegisterRequest(BaseModel):
     password: str
     name: str
     role: str
+    invite_code: Optional[str] = None
 
 # --- Utility Functions ---
 def verify_password(plain_password, hashed_password):
@@ -92,6 +93,11 @@ def require_role(required_role: str):
 def register_user(payload: RegisterRequest, db: Session = Depends(get_db)):
     if payload.role not in ["student", "teacher"]:
         raise HTTPException(status_code=400, detail="Invalid role")
+        
+    if payload.role == "teacher":
+        expected_code = os.environ.get("TEACHER_INVITE_CODE", "lumora-admin-secret-123")
+        if payload.invite_code != expected_code:
+            raise HTTPException(status_code=403, detail="Invalid teacher invite code")
         
     existing_user = db.query(User).filter(User.username == payload.username).first()
     if existing_user:
